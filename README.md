@@ -72,7 +72,7 @@ Smart Outreach Hub addresses these challenges through an intelligent, scalable S
 
 # Deployment
 
-## Prequisites
+## Prerequisites
 
 Before deploying the Smart Outreach Hub solution, ensure you have the following prerequisites in place:
 1. Sign up for an [AWS account](https://signin.aws.amazon.com/signup?request_type=register) if you haven't already
