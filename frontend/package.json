@@ -1,0 +1,58 @@
+{
+    "name": "smart-oureach-hub",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+        "type-check": "tsc --noEmit"
+    },
+    "engines": {
+        "node": "22.x",
+        "npm": "10.x"
+    },
+    "dependencies": {
+        "@aws-amplify/auth": "^6.15.0",
+        "@aws-amplify/ui-react": "^6.11.2",
+        "@aws-sdk/client-dynamodb": "^3.450.0",
+        "@aws-sdk/client-pinpoint-sms-voice-v2": "^3.450.0",
+        "@aws-sdk/client-sns": "^3.450.0",
+        "@aws-sdk/lib-dynamodb": "^3.450.0",
+        "@graphql-tools/schema": "^10.0.0",
+        "@types/formidable": "^3.4.5",
+        "@types/papaparse": "^5.3.14",
+        "@urql/exchange-auth": "^3.0.0",
+        "aws-amplify": "^6.15.5",
+        "class-variance-authority": "^0.7.0",
+        "clsx": "^2.0.0",
+        "date-fns": "^2.30.0",
+        "formidable": "^3.5.1",
+        "graphql": "^16.8.1",
+        "graphql-yoga": "^5.0.0",
+        "libphonenumber-js": "^1.12.12",
+        "lucide-react": "^0.292.0",
+        "papaparse": "^5.4.1",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^6.20.0",
+        "tailwind-merge": "^2.0.0",
+        "urql": "^4.0.5"
+    },
+    "devDependencies": {
+        "@types/node": "^20.8.10",
+        "@types/react": "^18.2.33",
+        "@types/react-dom": "^18.2.14",
+        "@vitejs/plugin-react": "^4.1.0",
+        "autoprefixer": "^10.4.16",
+        "eslint": "^8.52.0",
+        "@typescript-eslint/eslint-plugin": "^6.10.0",
+        "@typescript-eslint/parser": "^6.10.0",
+        "postcss": "^8.4.31",
+        "tailwindcss": "^3.3.5",
+        "terser": "^5.19.4",
+        "typescript": "^5.2.2",
+        "vite": "^4.5.0"
+    }
+}
