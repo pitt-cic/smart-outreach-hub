@@ -1,0 +1,6 @@
+pydantic-ai-slim[bedrock]
+pydantic-ai-slim[logfire]
+pydantic
+boto3
+logfire
+phonenumbers
