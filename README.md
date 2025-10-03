@@ -355,7 +355,7 @@ Before deploying the Smart Outreach Hub solution, ensure you have the following 
 - [Todd Shell](https://pittsburghpanthers.com/staff-directory/todd-shell/3763) - Associate Athletic Director, Ticket Sales and Service, Pitt Athletics
 
 This project is designed and developed with guidance and support from
-the [Health Sciences and Sports Analytics Cloud Innovation Center, powered by AWS](https://digital.pitt.edu/cio/cic).
+the [Health Sciences and Sports Analytics Cloud Innovation Center, powered by AWS](https://digital.pitt.edu/cic).
 
 # License
 
