@@ -130,7 +130,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+lib/*
 lib64/
 parts/
 sdist/
@@ -321,3 +321,6 @@ __marimo__/
 # Test reports
 agent/tests/reports/
 agent/test_report.html
+
+# Include the backend lib directory (for CDK assets)
+!backend/lib
