@@ -1,11 +1,11 @@
 {
-    "name": "marketing-backend",
-    "version": "0.1.0",
+    "name": "smart-outreach-hub-backend",
+    "version": "1.0.0",
     "workspaces": [
         "lambda"
     ],
     "bin": {
-        "marketing-backend": "bin/marketing-backend.js"
+        "marketing-backend": "bin/app.js"
     },
     "scripts": {
         "install:all": "npm install --workspaces",

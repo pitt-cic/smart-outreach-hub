@@ -29,14 +29,14 @@ interface StackConfig {
     calendlyUrl: string;
 }
 
-interface MarketingBackendStackProps extends cdk.StackProps {
+interface SmartOutreachHubBackendStackProps extends cdk.StackProps {
     stackConfig?: StackConfig;
 }
 
-export class MarketingBackendStack extends cdk.Stack {
+export class SmartOutreachHubBackendStack extends cdk.Stack {
     private readonly stackConfig: StackConfig;
 
-    constructor(scope: Construct, id: string, props?: MarketingBackendStackProps) {
+    constructor(scope: Construct, id: string, props?: SmartOutreachHubBackendStackProps) {
         super(scope, id, props);
 
         // Initialize stack configuration from context or defaults

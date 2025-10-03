@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-STACK_NAME="MarketingBackendStack"
+STACK_NAME="SmartOutreachHubBackendStack"
 FRONTEND_DIR="./frontend"
 BUILD_DIR="$FRONTEND_DIR/dist"
 
