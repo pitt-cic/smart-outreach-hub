@@ -324,3 +324,5 @@ agent/test_report.html
 
 # Include the backend lib directory (for CDK assets)
 !backend/lib
+# Include the frontend lib directory
+!frontend/src/lib
