@@ -23,7 +23,7 @@ The platform delivers a comprehensive suite of features, including campaign mana
 **_While built for Pitt Athletics, the solution is designed to be adaptable for any organization requiring automated SMS outreach with human oversight. The AI agent's behavior can be customized through prompt engineering to match different use cases, industries, and communication styles._**
 
 ## Demo
-**TODO: Add demo video or link here**
+https://github.com/user-attachments/assets/de33afcc-d27d-4cc6-b467-e872fd66b26c
 
 # Description
 
@@ -40,7 +40,14 @@ Smart Outreach Hub addresses these challenges through an intelligent, scalable S
 
 **Modern User Interface**: The web interface provides sales teams with comprehensive campaign management capabilities including prospect list uploads via CSV, campaign creation and editing, and real-time delivery of campaign messages. Beyond campaign operations, the interface offers visibility into key metrics such as handoff rates and response sentiment analysis. When human intervention is needed, the chat interface displays complete conversation histories including AI-generated responses, enabling seamless takeover and continuity in customer interactions.
 
+
+
+
+
 ## Architecture Diagram
+
+
+
 ![Smart Outreach Hub Architecture](./docs/architecture.png)
 
 ## Tech Stack
