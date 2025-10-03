@@ -68,7 +68,7 @@ echo "🚀 Bootstrapping CDK (if needed)..."
 cdk bootstrap
 
 # Deploy the stack
-STACK_NAME="MarketingBackendStack"
+STACK_NAME="SmartOutreachHubBackendStack"
 echo "🚀 Deploying stack: $STACK_NAME"
 cdk deploy
 

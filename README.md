@@ -182,7 +182,7 @@ Before deploying the Smart Outreach Hub solution, ensure you have the following 
      ```
   2. **Get the stack outputs from the backend deployment**:
      ```bash
-     export STACK_NAME="MarketingBackendStack"
+     export STACK_NAME="SmartOutreachHubBackendStack"
      aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[].{OutputKey:OutputKey,OutputValue:OutputValue}" --output table
      ```
   3. **Note down the following output values**:
