@@ -1,0 +1,41 @@
+{
+    "name": "marketing-backend",
+    "version": "0.1.0",
+    "workspaces": [
+        "lambda"
+    ],
+    "bin": {
+        "marketing-backend": "bin/marketing-backend.js"
+    },
+    "scripts": {
+        "install:all": "npm install --workspaces",
+        "build:lambda": "npm run build --workspace=lambda",
+        "build": "npm run build:lambda && tsc",
+        "watch": "tsc -w",
+        "test": "jest",
+        "cdk": "cdk",
+        "predeploy": "npm run build",
+        "deploy": "cdk deploy",
+        "destroy": "cdk destroy",
+        "synth": "cdk synth",
+        "clean": "npm run clean --workspaces --if-present && rm -rf node_modules dist"
+    },
+    "devDependencies": {
+        "@types/jest": "^29.4.0",
+        "@types/node": "18.14.6",
+        "@types/aws-lambda": "^8.10.119",
+        "aws-cdk": "2.1029.0",
+        "jest": "^29.7.0",
+        "ts-jest": "^29.2.5",
+        "ts-node": "^10.9.2",
+        "typescript": "~5.6.3"
+    },
+    "dependencies": {
+        "aws-cdk-lib": "2.214.0",
+        "constructs": "^10.0.0",
+        "@aws-sdk/client-dynamodb": "^3.450.0",
+        "@aws-sdk/client-sns": "^3.450.0",
+        "@aws-sdk/client-pinpoint-sms-voice-v2": "^3.450.0",
+        "@aws-sdk/lib-dynamodb": "^3.450.0"
+    }
+}

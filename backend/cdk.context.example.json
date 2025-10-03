@@ -1,0 +1,7 @@
+{
+    "smsConfig:originationNumber": "+1XXXXXXXXXX",
+    "smsConfig:phoneNumberId": "phone-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "bedrockConfig:modelName": "bedrock-model-name",
+    "pydanticConfig:logfireToken": "pydantic-logfire-token",
+    "meetingConfig:calendlyUrl":"https://calendly.com/XXXXXX/15min"
+}
