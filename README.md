@@ -23,7 +23,7 @@ The platform delivers a comprehensive suite of features, including campaign mana
 **_While built for Pitt Athletics, the solution is designed to be adaptable for any organization requiring automated SMS outreach with human oversight. The AI agent's behavior can be customized through prompt engineering to match different use cases, industries, and communication styles._**
 
 ## Demo
-https://github.com/user-attachments/assets/de33afcc-d27d-4cc6-b467-e872fd66b26c
+https://github.com/user-attachments/assets/f522c984-0acd-493c-8e29-4c19f7560396
 
 # Description
 
