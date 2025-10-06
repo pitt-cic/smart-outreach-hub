@@ -1,3 +1,5 @@
+"""System prompt configuration and loading for the sales agent."""
+
 import logging
 import pathlib
 

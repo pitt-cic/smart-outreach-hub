@@ -1,3 +1,5 @@
+"""Pydantic Logfire configuration and initialization."""
+
 import os
 
 import logfire

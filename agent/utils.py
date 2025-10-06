@@ -1,3 +1,5 @@
+"""Utility functions for AWS configuration, HTTP requests, and datetime formatting."""
+
 import os
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict
@@ -6,6 +8,7 @@ import requests
 
 
 def get_boto3_session_config() -> Dict[str, Any]:
+    """Get boto3 session configuration based on environment settings."""
     config = {"region_name": os.environ.get("AWS_REGION", "us-east-1")}
     if os.environ["ENVIRONMENT"] in ["test", "local"]:
         if "AWS_PROFILE" in os.environ:
@@ -35,6 +38,7 @@ def get_boto3_session_config() -> Dict[str, Any]:
 
 
 def get_dynamodb_resource_config() -> Dict[str, Any]:
+    """Get DynamoDB resource configuration for local or AWS environments."""
     config = {}
     if os.environ["ENVIRONMENT"] in ["test", "local"]:
         config["endpoint_url"] = "http://localhost:8000"  # DynamoDB Local
@@ -74,6 +78,7 @@ def check_if_valid_iso_date(date_str: str) -> bool:
 
 
 def convert_datetime_to_iso(datetime_obj: datetime):
+    """Convert datetime object to ISO format string with UTC timezone."""
     if datetime_obj.tzinfo is None:
         # Convert naive datetime to UTC
         datetime_obj = datetime_obj.astimezone(tz=timezone.utc)
@@ -135,6 +140,7 @@ def format_utc_to_friendly_est(utc_date_str: str) -> str:
 
 
 def format_first_five_time_slots(slots: list[dict[str, Any]]) -> str:
+    """Format the first five time slots into a friendly string representation."""
     first_five_slots = []
     for slot in slots[:5]:
         start_time = slot.get("start_time")

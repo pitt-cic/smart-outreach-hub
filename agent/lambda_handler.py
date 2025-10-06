@@ -1,3 +1,5 @@
+"""AWS Lambda handler for processing incoming messages and webhooks."""
+
 import asyncio
 import json
 import os

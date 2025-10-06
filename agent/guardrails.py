@@ -1,3 +1,5 @@
+"""Content guardrails and safety checks for agent responses."""
+
 import os
 from typing import Optional
 
@@ -49,6 +51,7 @@ def apply_guardrails(text: str, source: str = "INPUT") -> tuple[bool, Optional[s
 
 
 def get_guardrails_response(response: dict) -> str:
+    """Extract text response from guardrails API response or return fallback message."""
     if isinstance(response.get("outputs"), list) and len(response["outputs"]) > 0:
         return response["outputs"][0]["text"]
 

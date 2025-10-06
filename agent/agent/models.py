@@ -1,3 +1,5 @@
+"""Data models for agent responses and context."""
+
 from typing import Literal, Optional
 
 from pydantic import BaseModel
@@ -46,6 +48,8 @@ class AgentResponseWrapper(AgentResponse):
 
 @dataclass
 class AgentContext:
+    """Context information for agent interactions including customer details and campaign data."""
+
     customer_phone_number: str
     customer_name: str
     customer_email: Optional[str] = None

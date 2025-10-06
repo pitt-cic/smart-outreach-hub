@@ -1,3 +1,5 @@
+"""Utility functions for converting conversation history to pydantic-ai message format."""
+
 from typing import Dict, List
 
 from pydantic_ai.messages import ModelRequest, ModelResponse, TextPart, UserPromptPart

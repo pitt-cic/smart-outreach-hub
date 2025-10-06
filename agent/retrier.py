@@ -1,3 +1,5 @@
+"""Retry utilities with exponential backoff for handling transient failures."""
+
 import asyncio
 import random
 

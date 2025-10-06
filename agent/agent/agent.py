@@ -1,3 +1,5 @@
+"""Sales agent implementation using pydantic-ai for customer interactions."""
+
 import os
 
 import boto3
@@ -25,6 +27,7 @@ sales_agent = Agent[AgentContext, AgentResponse](
 
 @sales_agent.instructions
 async def add_campaign_context(ctx: RunContext[AgentContext]) -> str:
+    """Add campaign context to agent instructions based on the most recent campaign."""
     campaign_details = "No campaign context available."
     if ctx.deps.most_recent_campaign_id:
         campaign = get_campaign_by_id(ctx.deps.most_recent_campaign_id)

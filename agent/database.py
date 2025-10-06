@@ -1,3 +1,5 @@
+"""Database operations for customer data, conversations, and campaigns."""
+
 import os
 import sys
 from datetime import datetime

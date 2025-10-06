@@ -1,3 +1,5 @@
+"""Main module for processing customer messages and generating agent responses."""
+
 from typing import Optional, Union
 
 from pydantic_ai.usage import Usage, UsageLimits
@@ -60,9 +62,6 @@ async def process_message(
         # Normalize phone number for consistent processing
         normalized_phone = normalize_phone_number(phone_number)
 
-        # Get or create customer
-        # TODO: inbound-message-processor also handles customer creation
-        # maybe just pass the customer object in the event?
         customer = get_or_create_customer(normalized_phone)
 
         # Check customer status - only respond with AI if status is 'automated'

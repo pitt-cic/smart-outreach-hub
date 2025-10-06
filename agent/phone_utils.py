@@ -1,3 +1,5 @@
+"""Phone number utilities for normalization and validation."""
+
 import phonenumbers
 from phonenumbers import NumberParseException
 
