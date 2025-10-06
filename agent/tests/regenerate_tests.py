@@ -1,12 +1,13 @@
 import asyncio
 import sys
-from pathlib import Path
 import traceback
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent))
 
 # Import the test suite
 from test_conversations import main as run_tests
+
 
 def print_banner():
     print("🔄 Running Sales Agent Test Results")
@@ -16,15 +17,16 @@ def print_banner():
     print("- test_report.html (visual report)")
     print()
 
+
 async def regenerate():
     """Regenerate all test results"""
     print("🚀 Starting Sales Agent Test Suite")
     print("=" * 60)
     print()
-    
+
     # Run the tests
     await run_tests()
-    
+
     print()
     print("🎉 Test regeneration complete!")
     print()
