@@ -14,9 +14,9 @@ from typing import Any, Optional
 logger = setup_logging(__name__)
 
 # Table names from environment variables
-CUSTOMER_TABLE_NAME = os.environ.get('DYNAMODB_CUSTOMER_TABLE', 'marketing-customers')
-CAMPAIGN_TABLE_NAME = os.environ.get('DYNAMODB_CAMPAIGN_TABLE', 'marketing-campaigns')
-CHAT_TABLE_NAME = os.environ.get('DYNAMODB_CHAT_TABLE', 'marketing-chat-history')
+CUSTOMER_TABLE_NAME = os.environ.get('DYNAMODB_CUSTOMER_TABLE', 'outreach-customers')
+CAMPAIGN_TABLE_NAME = os.environ.get('DYNAMODB_CAMPAIGN_TABLE', 'outreach-campaigns')
+CHAT_TABLE_NAME = os.environ.get('DYNAMODB_CHAT_TABLE', 'outreach-chat-history')
 
 
 # Initialize DynamoDB resource and table references

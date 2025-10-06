@@ -38,10 +38,10 @@ export function initializeDatabase(): DynamoDBDocumentClient {
 
     // Initialize table names from environment variables
     tableNames = {
-        customers: process.env.DYNAMODB_CUSTOMER_TABLE || 'marketing-customers',
-        campaigns: process.env.DYNAMODB_CAMPAIGN_TABLE || 'marketing-campaigns',
-        chatHistory: process.env.DYNAMODB_CHAT_TABLE || 'marketing-chat-history',
-        campaignCustomers: process.env.DYNAMODB_CAMPAIGN_CUSTOMER_TABLE || 'marketing-campaign-customers',
+        customers: process.env.DYNAMODB_CUSTOMER_TABLE || 'outreach-customers',
+        campaigns: process.env.DYNAMODB_CAMPAIGN_TABLE || 'outreach-campaigns',
+        chatHistory: process.env.DYNAMODB_CHAT_TABLE || 'outreach-chat-history',
+        campaignCustomers: process.env.DYNAMODB_CAMPAIGN_CUSTOMER_TABLE || 'outreach-campaign-customers',
     };
 
     console.log('DynamoDB client initialized with tables:', tableNames);

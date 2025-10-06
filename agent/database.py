@@ -18,9 +18,9 @@ session = boto3.Session(**get_boto3_session_config())
 dynamodb = session.resource('dynamodb', **get_dynamodb_resource_config())
 
 # Table names from environment variables
-CUSTOMER_TABLE_NAME = os.environ.get('DYNAMODB_CUSTOMER_TABLE', 'marketing-customers')
-CAMPAIGN_TABLE_NAME = os.environ.get('DYNAMODB_CAMPAIGN_TABLE', 'marketing-campaigns')
-CHAT_TABLE_NAME = os.environ.get('DYNAMODB_CHAT_TABLE', 'marketing-chat-history')
+CUSTOMER_TABLE_NAME = os.environ.get('DYNAMODB_CUSTOMER_TABLE', 'outreach-customers')
+CAMPAIGN_TABLE_NAME = os.environ.get('DYNAMODB_CAMPAIGN_TABLE', 'outreach-campaigns')
+CHAT_TABLE_NAME = os.environ.get('DYNAMODB_CHAT_TABLE', 'outreach-chat-history')
 
 def get_table_references():
     """Get DynamoDB table references."""

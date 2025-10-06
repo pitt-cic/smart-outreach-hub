@@ -15,7 +15,7 @@ async function invokePythonAgent(phoneNumber: string, message: string): Promise<
     };
 
     const command = new InvokeCommand({
-        FunctionName: 'marketing-ai-agent',
+        FunctionName: 'outreach-ai-agent',
         InvocationType: 'RequestResponse', // Synchronous call
         Payload: JSON.stringify(payload)
     });
@@ -84,10 +84,16 @@ function dbCampaignToGraphQL(dbCampaign: DbCampaign): Campaign {
     const neutralResponseCount = dbCampaign.neutral_response_count || 0;
     const negativeResponseCount = dbCampaign.negative_response_count || 0;
     const totalResponses = positiveResponseCount + neutralResponseCount + negativeResponseCount;
-    const positiveResponseRate = Math.round(positiveResponseCount / totalResponses * 100);
-    const neutralResponseRate = Math.round(neutralResponseCount / totalResponses * 100);
-    const negativeResponseRate = Math.round(negativeResponseCount / totalResponses * 100);
-    
+    let positiveResponseRate = 0;
+    let neutralResponseRate = 0;
+    let negativeResponseRate = 0;
+
+    if (totalResponses > 0) {
+        positiveResponseRate = Math.round(positiveResponseCount / totalResponses * 100);
+        neutralResponseRate = Math.round(neutralResponseCount / totalResponses * 100);
+        negativeResponseRate = Math.round(negativeResponseCount / totalResponses * 100);
+    }
+
     return {
         campaignId: dbCampaign.campaign_id,
         name: dbCampaign.name,
@@ -272,7 +278,10 @@ export const resolvers = {
                 // Create personalized message
                 const message = `Hi ${dbCustomer.first_name}, let's schedule a meeting to discuss your interest. Please book a time that works for you: ${meetingUrl}`;
 
-                logInfo('Prefilled meeting message generated', {phoneNumber, customerName: `${dbCustomer.first_name} ${dbCustomer.last_name}`});
+                logInfo('Prefilled meeting message generated', {
+                    phoneNumber,
+                    customerName: `${dbCustomer.first_name} ${dbCustomer.last_name}`
+                });
                 return message;
             } catch (error) {
                 logError('Error getting prefilled meeting message', error);
@@ -322,7 +331,9 @@ export const resolvers = {
             }
         },
 
-        updateCampaign: async (_: any, {input}: { input: { campaignId: string, campaignDetails?: string } }): Promise<Campaign> => {
+        updateCampaign: async (_: any, {input}: {
+            input: { campaignId: string, campaignDetails?: string }
+        }): Promise<Campaign> => {
             try {
                 logInfo('Updating campaign', {input});
 

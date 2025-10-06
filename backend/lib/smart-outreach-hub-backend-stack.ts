@@ -51,7 +51,7 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         // AWS Amplify App for Frontend Hosting
         const amplifyAppConfig: any = {
             name: 'smart-outreach-hub',
-            description: 'Smart Outreach Hub - AI-powered marketing platform frontend',
+            description: 'Smart Outreach Hub - AI-driven SMS Marketing Platform Frontend App',
             platform: 'WEB',
             customRules: [
                 {
@@ -76,7 +76,7 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
             ],
         };
 
-        const amplifyApp = new amplify.CfnApp(this, 'MarketingAmplifyApp', amplifyAppConfig);
+        const amplifyApp = new amplify.CfnApp(this, 'SmartOutreachHubAmplifyApp', amplifyAppConfig);
 
         // Create Bedrock Guardrail for AI Safety
         const bedrockGuardrail = new bedrock.CfnGuardrail(this, 'SmartOutreachHubGuardrail', {
@@ -144,7 +144,7 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
 
         // DynamoDB Tables
         const customerTable = new dynamodb.Table(this, 'CustomerTable', {
-            tableName: 'marketing-customers',
+            tableName: 'outreach-customers',
             partitionKey: {
                 name: 'phone_number',
                 type: dynamodb.AttributeType.STRING,
@@ -157,7 +157,7 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         });
 
         const chatTable = new dynamodb.Table(this, 'ChatTable', {
-            tableName: 'marketing-chat-history',
+            tableName: 'outreach-chat-history',
             partitionKey: {
                 name: 'id',
                 type: dynamodb.AttributeType.STRING,
@@ -183,7 +183,7 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         });
 
         const campaignTable = new dynamodb.Table(this, 'CampaignTable', {
-            tableName: 'marketing-campaigns',
+            tableName: 'outreach-campaigns',
             partitionKey: {
                 name: 'campaign_id',
                 type: dynamodb.AttributeType.STRING,
@@ -196,7 +196,7 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         });
 
         const campaignCustomerTable = new dynamodb.Table(this, 'CampaignCustomerTable', {
-            tableName: 'marketing-campaign-customers',
+            tableName: 'outreach-campaign-customers',
             partitionKey: {
                 name: 'campaign_id',
                 type: dynamodb.AttributeType.STRING,
@@ -227,13 +227,13 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
 
         // SNS Topic for message processing
         const messageTopic = new sns.Topic(this, 'MessageTopic', {
-            topicName: 'marketing-messages',
-            displayName: 'Marketing Messages Topic',
+            topicName: 'outreach-messages',
+            displayName: 'Smart Outreach Hub Messages Topic',
         });
 
         // Cognito User Pool for authentication
-        const userPool = new cognito.UserPool(this, 'MarketingUserPool', {
-            userPoolName: 'marketing-user-pool',
+        const userPool = new cognito.UserPool(this, 'SmartOutreachHubUserPool', {
+            userPoolName: 'outreach-user-pool',
             signInAliases: {
                 email: true,
             },
@@ -269,9 +269,9 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         });
 
         // Cognito User Pool Client
-        const userPoolClient = new cognito.UserPoolClient(this, 'MarketingUserPoolClient', {
+        const userPoolClient = new cognito.UserPoolClient(this, 'SmartOutreachHubUserPoolClient', {
             userPool,
-            userPoolClientName: 'marketing-web-client',
+            userPoolClientName: 'outreach-web-client',
             generateSecret: false, // No secret for web clients
             authFlows: {
                 userSrp: true,
@@ -305,15 +305,15 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         });
 
         // Cognito User Pool Domain for hosted UI
-        const userPoolDomain = new cognito.UserPoolDomain(this, 'MarketingUserPoolDomain', {
+        const userPoolDomain = new cognito.UserPoolDomain(this, 'SmartOutreachHubUserPoolDomain', {
             userPool,
             cognitoDomain: {
-                domainPrefix: `marketing-auth-${this.account}`, // Must be globally unique
+                domainPrefix: `outreach-auth-${this.account}`, // Must be globally unique
             },
         });
 
         // Amplify Branch for the main deployment
-        const amplifyBranch = new amplify.CfnBranch(this, 'MarketingAmplifyBranch', {
+        const amplifyBranch = new amplify.CfnBranch(this, 'SmartOutreachHubAmplifyBranch', {
             appId: amplifyApp.attrAppId,
             branchName: 'main',
             stage: 'PRODUCTION',
@@ -323,8 +323,8 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
 
 
         // API Gateway for SMS webhook (optional - can point to the Next.js server instead)
-        const api = new apigateway.RestApi(this, 'MarketingApi', {
-            restApiName: 'Marketing SMS API',
+        const api = new apigateway.RestApi(this, 'SmartOutreachHubApi', {
+            restApiName: 'Smart Outreach Hub SMS API',
             description: 'API for SMS webhook handling',
             defaultCorsPreflightOptions: {
                 allowOrigins: apigateway.Cors.ALL_ORIGINS,
@@ -336,45 +336,45 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         // Cognito Authorizer for API Gateway
         const cognitoAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'CognitoAuthorizer', {
             cognitoUserPools: [userPool],
-            authorizerName: 'marketing-cognito-authorizer',
+            authorizerName: 'outreach-cognito-authorizer',
             identitySource: 'method.request.header.Authorization',
         });
 
         // SQS Queue for outbound SMS messages (direct SMS)
-        const outboundSmsQueue = new sqs.Queue(this, 'OutboundSmsQueue', {
-            queueName: 'marketing-outbound-sms-queue',
+        const outboundSmsQueue = new sqs.Queue(this, 'SmartOutreachHubOutboundSmsQueue', {
+            queueName: 'outreach-outbound-sms-queue',
             visibilityTimeout: cdk.Duration.minutes(3),
             retentionPeriod: cdk.Duration.days(14),
             deadLetterQueue: {
-                queue: new sqs.Queue(this, 'OutboundSmsDeadLetterQueue', {
-                    queueName: 'marketing-outbound-sms-dlq',
+                queue: new sqs.Queue(this, 'SmartOutreachHubOutboundSmsDeadLetterQueue', {
+                    queueName: 'outreach-outbound-sms-dlq',
                 }),
                 maxReceiveCount: 3,
             },
         });
 
         // SQS Queue for all campaign messages (unified)
-        const campaignMessageQueue = new sqs.Queue(this, 'CampaignMessageQueue', {
-            queueName: 'marketing-campaign-message-queue',
+        const campaignMessageQueue = new sqs.Queue(this, 'SmartOutreachHubCampaignMessageQueue', {
+            queueName: 'outreach-campaign-message-queue',
             visibilityTimeout: cdk.Duration.minutes(3),
             retentionPeriod: cdk.Duration.days(14),
             deadLetterQueue: {
-                queue: new sqs.Queue(this, 'CampaignMessageDeadLetterQueue', {
-                    queueName: 'marketing-campaign-message-dlq',
+                queue: new sqs.Queue(this, 'SmartOutreachHubMessageDeadLetterQueue', {
+                    queueName: 'outreach-campaign-message-dlq',
                 }),
                 maxReceiveCount: 3,
             },
         });
 
         const aiAgentLogGroup = new logs.LogGroup(this, 'AiAgentLogGroup', {
-            logGroupName: '/aws/lambda/marketing-ai-agent',
+            logGroupName: '/aws/lambda/outreach-ai-agent',
             retention: logs.RetentionDays.ONE_WEEK,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
 
         // Python Lambda function for AI Agent processing
         const aiAgentFunction = new lambda.Function(this, 'AiAgentFunction', {
-            functionName: 'marketing-ai-agent',
+            functionName: 'outreach-ai-agent',
             runtime: lambda.Runtime.PYTHON_3_12,
             architecture: lambda.Architecture.ARM_64,
             handler: 'lambda_handler.lambda_handler',
@@ -388,8 +388,8 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
                     ],
                 },
             }),
-            timeout: cdk.Duration.minutes(15), // Long timeout for AI processing
-            memorySize: 2048, // High memory for AI workloads
+            timeout: cdk.Duration.minutes(15),
+            memorySize: 2048,
             environment: {
                 ENVIRONMENT: 'dev',
                 // Amazon Bedrock Configuration
@@ -447,7 +447,7 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
                 'sns:Publish',
             ],
             resources: [
-                `arn:aws:sns:${this.region}:${this.account}:marketing-*`,
+                `arn:aws:sns:${this.region}:${this.account}:outreach-*`,
                 `arn:aws:sms-voice:${this.region}:${this.account}:*`,
             ],
         }));
@@ -473,14 +473,14 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         healthResource.addMethod('GET', aiAgentIntegration);
 
         const graphqlLogGroup = new logs.LogGroup(this, 'GraphQLLogGroup', {
-            logGroupName: '/aws/lambda/marketing-graphql-api',
+            logGroupName: '/aws/lambda/outreach-graphql-api',
             retention: logs.RetentionDays.ONE_WEEK,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
 
         // GraphQL Lambda function
-        const graphqlFunction = new lambda.Function(this, 'GraphQLFunction', {
-            functionName: 'marketing-graphql-api',
+        const graphqlFunction = new lambda.Function(this, 'SmartOutreachHubGraphQLFunction', {
+            functionName: 'outreach-graphql-api',
             runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
             handler: 'functions/graphql/index.handler',
             code: lambda.Code.fromAsset(path.join(__dirname, '../lambda'), {
@@ -551,15 +551,15 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
             proxy: true,
         }));
 
-        const campaignsLogGroup = new logs.LogGroup(this, 'CampaignsLogGroup', {
-            logGroupName: '/aws/lambda/marketing-campaigns-api',
+        const campaignsLogGroup = new logs.LogGroup(this, 'SmartOutreachHubCampaignsLogGroup', {
+            logGroupName: '/aws/lambda/outreach-campaigns-api',
             retention: logs.RetentionDays.ONE_WEEK,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
 
         // Campaigns Lambda function
-        const campaignsFunction = new lambda.Function(this, 'CampaignsFunction', {
-            functionName: 'marketing-campaigns-api',
+        const campaignsFunction = new lambda.Function(this, 'SmartOutreachHubCampaignsFunction', {
+            functionName: 'outreach-campaigns-api',
             runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
             handler: 'functions/campaigns/index.handler',
             code: lambda.Code.fromAsset(path.join(__dirname, '../lambda'), {
@@ -614,17 +614,19 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         });
 
         // Use existing SNS Topic for incoming SMS messages
-        const existingInboundTopicArn = 'arn:aws:sns:us-east-1:533022342868:test-incoming-msg-topic';
-        const inboundSmsTopic = sns.Topic.fromTopicArn(this, 'ExistingInboundSmsTopic', existingInboundTopicArn);
+        const inboundSmsTopic = new sns.Topic(this, 'InboundSmsTopic', {
+            topicName: 'outreach-inbound-sms',
+            displayName: 'Smart Outreach Hub Inbound SMS Topic',
+        });
 
         // SQS Queue for processing inbound messages
         const inboundSmsQueue = new sqs.Queue(this, 'InboundSmsQueue', {
-            queueName: 'marketing-inbound-sms-queue',
+            queueName: 'outreach-inbound-sms-queue',
             visibilityTimeout: cdk.Duration.minutes(5),
             retentionPeriod: cdk.Duration.days(14),
             deadLetterQueue: {
                 queue: new sqs.Queue(this, 'InboundSmsDeadLetterQueue', {
-                    queueName: 'marketing-inbound-sms-dlq',
+                    queueName: 'outreach-inbound-sms-dlq',
                     retentionPeriod: cdk.Duration.days(14),
                 }),
                 maxReceiveCount: 3,
@@ -634,15 +636,15 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         // Subscribe our SQS queue to the existing SNS topic
         inboundSmsTopic.addSubscription(new snsSubscriptions.SqsSubscription(inboundSmsQueue));
 
-        const inboundSmsLogGroup = new logs.LogGroup(this, 'InboundSmsLogGroup', {
-            logGroupName: '/aws/lambda/marketing-inbound-sms-processor',
+        const inboundSmsLogGroup = new logs.LogGroup(this, 'SmartOutreachHubInboundSmsLogGroup', {
+            logGroupName: '/aws/lambda/outreach-inbound-sms-processor',
             retention: logs.RetentionDays.ONE_WEEK,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
 
         // Lambda function for processing inbound SMS messages
-        const inboundSmsProcessor = new lambda.Function(this, 'InboundSmsProcessor', {
-            functionName: 'marketing-inbound-sms-processor',
+        const inboundSmsProcessor = new lambda.Function(this, 'SmartOutreachHubInboundSmsProcessor', {
+            functionName: 'outreach-inbound-sms-processor',
             runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
             handler: 'functions/inbound-sms-processor/index.handler',
             architecture: lambda.Architecture.ARM_64,
@@ -686,15 +688,15 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         chatTable.grantReadWriteData(inboundSmsProcessor);
         aiAgentFunction.grantInvoke(inboundSmsProcessor);
 
-        const directSmsLogGroup = new logs.LogGroup(this, 'DirectSmsLogGroup', {
-            logGroupName: '/aws/lambda/marketing-direct-sms',
+        const directSmsLogGroup = new logs.LogGroup(this, 'SmartOutreachHubDirectSmsLogGroup', {
+            logGroupName: '/aws/lambda/outreach-direct-sms',
             retention: logs.RetentionDays.ONE_WEEK,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
 
         // Lambda function for direct SMS sending (manual messages)
-        const directSmsFunction = new lambda.Function(this, 'DirectSmsFunction', {
-            functionName: 'marketing-direct-sms',
+        const directSmsFunction = new lambda.Function(this, 'SmartOutreachHubDirectSmsFunction', {
+            functionName: 'outreach-direct-sms',
             runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
             handler: 'functions/direct-sms/index.handler',
             architecture: lambda.Architecture.ARM_64,
@@ -788,217 +790,217 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         new cdk.CfnOutput(this, 'CustomerTableName', {
             value: customerTable.tableName,
             description: 'DynamoDB Customer Table Name',
-            exportName: 'MarketingCustomerTableName',
+            exportName: 'SmartOutreachHubCustomerTableName',
         });
 
         new cdk.CfnOutput(this, 'ChatTableName', {
             value: chatTable.tableName,
             description: 'DynamoDB Chat History Table Name',
-            exportName: 'MarketingChatTableName',
+            exportName: 'SmartOutreachHubChatTableName',
         });
 
         new cdk.CfnOutput(this, 'CampaignTableName', {
             value: campaignTable.tableName,
             description: 'DynamoDB Campaign Table Name',
-            exportName: 'MarketingCampaignTableName',
+            exportName: 'SmartOutreachHubCampaignTableName',
         });
 
         new cdk.CfnOutput(this, 'CampaignCustomerTableName', {
             value: campaignCustomerTable.tableName,
             description: 'DynamoDB Campaign Customer Table Name',
-            exportName: 'MarketingCampaignCustomerTableName',
+            exportName: 'SmartOutreachHubCampaignCustomerTableName',
         });
 
         new cdk.CfnOutput(this, 'MessageTopicArn', {
             value: messageTopic.topicArn,
             description: 'SNS Topic ARN for message processing',
-            exportName: 'MarketingMessageTopicArn',
+            exportName: 'SmartOutreachHubMessageTopicArn',
         });
 
         new cdk.CfnOutput(this, 'ApiGatewayUrl', {
             value: api.url,
             description: 'API Gateway URL for SMS webhook',
-            exportName: 'MarketingApiGatewayUrl',
+            exportName: 'SmartOutreachHubApiGatewayUrl',
         });
 
         new cdk.CfnOutput(this, 'AmplifyAppId', {
             value: amplifyApp.attrAppId,
             description: 'AWS Amplify App ID for frontend hosting',
-            exportName: 'MarketingAmplifyAppId',
+            exportName: 'SmartOutreachHubAmplifyAppId',
         });
 
         new cdk.CfnOutput(this, 'AmplifyAppName', {
             value: amplifyApp.name,
             description: 'AWS Amplify App Name',
-            exportName: 'MarketingAmplifyAppName',
+            exportName: 'SmartOutreachHubAmplifyAppName',
         });
 
         // New outputs for AI Agent and Amplify
         new cdk.CfnOutput(this, 'AiAgentFunctionName', {
             value: aiAgentFunction.functionName,
             description: 'Lambda function name for AI Agent',
-            exportName: 'MarketingAiAgentFunctionName',
+            exportName: 'SmartOutreachHubAiAgentFunctionName',
         });
 
         new cdk.CfnOutput(this, 'AiAgentFunctionArn', {
             value: aiAgentFunction.functionArn,
             description: 'Lambda function ARN for AI Agent',
-            exportName: 'MarketingAiAgentFunctionArn',
+            exportName: 'SmartOutreachHubAiAgentFunctionArn',
         });
 
         new cdk.CfnOutput(this, 'AgentApiUrl', {
             value: `${api.url}agent/process-message`,
             description: 'API Gateway URL for AI Agent processing',
-            exportName: 'MarketingAgentApiUrl',
+            exportName: 'SmartOutreachHubAgentApiUrl',
         });
 
         // GraphQL Lambda Outputs
         new cdk.CfnOutput(this, 'GraphQLFunctionName', {
             value: graphqlFunction.functionName,
             description: 'Lambda function name for GraphQL API',
-            exportName: 'MarketingGraphQLFunctionName',
+            exportName: 'SmartOutreachHubGraphQLFunctionName',
         });
 
         new cdk.CfnOutput(this, 'GraphQLFunctionArn', {
             value: graphqlFunction.functionArn,
             description: 'Lambda function ARN for GraphQL API',
-            exportName: 'MarketingGraphQLFunctionArn',
+            exportName: 'SmartOutreachHubGraphQLFunctionArn',
         });
 
         new cdk.CfnOutput(this, 'GraphQLApiUrl', {
             value: `${api.url}graphql`,
             description: 'API Gateway URL for GraphQL API',
-            exportName: 'MarketingGraphQLApiUrl',
+            exportName: 'SmartOutreachHubGraphQLApiUrl',
         });
 
         new cdk.CfnOutput(this, 'GraphQLHealthUrl', {
             value: `${api.url}graphql/health`,
             description: 'GraphQL Lambda health check URL',
-            exportName: 'MarketingGraphQLHealthUrl',
+            exportName: 'SmartOutreachHubGraphQLHealthUrl',
         });
 
         // Campaigns Lambda Outputs
         new cdk.CfnOutput(this, 'CampaignsFunctionName', {
             value: campaignsFunction.functionName,
             description: 'Lambda function name for Campaigns API',
-            exportName: 'MarketingCampaignsFunctionName',
+            exportName: 'SmartOutreachHubCampaignsFunctionName',
         });
 
         new cdk.CfnOutput(this, 'CampaignsFunctionArn', {
             value: campaignsFunction.functionArn,
             description: 'Lambda function ARN for Campaigns API',
-            exportName: 'MarketingCampaignsFunctionArn',
+            exportName: 'SmartOutreachHubCampaignsFunctionArn',
         });
 
         new cdk.CfnOutput(this, 'CampaignsUploadUrl', {
             value: `${api.url}campaigns/upload`,
             description: 'API Gateway URL for Campaign Contact Upload',
-            exportName: 'MarketingCampaignsUploadUrl',
+            exportName: 'SmartOutreachHubCampaignsUploadUrl',
         });
 
         // Amplify Domain Output (will be available after deployment)
         new cdk.CfnOutput(this, 'AmplifyDomainUrl', {
             value: `https://${amplifyBranch.branchName}.${amplifyApp.attrAppId}.amplifyapp.com`,
             description: 'AWS Amplify frontend URL',
-            exportName: 'MarketingAmplifyDomainUrl',
+            exportName: 'SmartOutreachHubAmplifyDomainUrl',
         });
 
         // Cognito Outputs
         new cdk.CfnOutput(this, 'CognitoUserPoolId', {
             value: userPool.userPoolId,
             description: 'Cognito User Pool ID',
-            exportName: 'MarketingCognitoUserPoolId',
+            exportName: 'SmartOutreachHubCognitoUserPoolId',
         });
 
         new cdk.CfnOutput(this, 'CognitoUserPoolClientId', {
             value: userPoolClient.userPoolClientId,
             description: 'Cognito User Pool Client ID',
-            exportName: 'MarketingCognitoUserPoolClientId',
+            exportName: 'SmartOutreachHubCognitoUserPoolClientId',
         });
 
         new cdk.CfnOutput(this, 'CognitoUserPoolArn', {
             value: userPool.userPoolArn,
             description: 'Cognito User Pool ARN',
-            exportName: 'MarketingCognitoUserPoolArn',
+            exportName: 'SmartOutreachHubCognitoUserPoolArn',
         });
 
         new cdk.CfnOutput(this, 'CognitoDomain', {
             value: userPoolDomain.domainName,
             description: 'Cognito hosted UI domain',
-            exportName: 'MarketingCognitoDomain',
+            exportName: 'SmartOutreachHubCognitoDomain',
         });
 
         new cdk.CfnOutput(this, 'CognitoHostedUIUrl', {
             value: `https://${userPoolDomain.domainName}.auth.${this.region}.amazoncognito.com`,
             description: 'Cognito hosted UI URL',
-            exportName: 'MarketingCognitoHostedUIUrl',
+            exportName: 'SmartOutreachHubCognitoHostedUIUrl',
         });
         // SMS Infrastructure Outputs
         new cdk.CfnOutput(this, 'InboundSmsTopicArn', {
             value: inboundSmsTopic.topicArn,
             description: 'SNS Topic ARN for inbound SMS messages',
-            exportName: 'MarketingInboundSmsTopicArn',
+            exportName: 'SmartOutreachHubInboundSmsTopicArn',
         });
 
         new cdk.CfnOutput(this, 'InboundSmsQueueUrl', {
             value: inboundSmsQueue.queueUrl,
             description: 'SQS Queue URL for inbound SMS processing',
-            exportName: 'MarketingInboundSmsQueueUrl',
+            exportName: 'SmartOutreachHubInboundSmsQueueUrl',
         });
 
         new cdk.CfnOutput(this, 'OutboundSmsQueueUrl', {
             value: outboundSmsQueue.queueUrl,
             description: 'SQS Queue URL for outbound SMS processing',
-            exportName: 'MarketingOutboundSmsQueueUrl',
+            exportName: 'SmartOutreachHubOutboundSmsQueueUrl',
         });
 
         new cdk.CfnOutput(this, 'InboundSmsProcessorFunctionName', {
             value: inboundSmsProcessor.functionName,
             description: 'Lambda function name for inbound SMS processing',
-            exportName: 'MarketingInboundSmsProcessorFunctionName',
+            exportName: 'SmartOutreachHubInboundSmsProcessorFunctionName',
         });
 
         new cdk.CfnOutput(this, 'DirectSmsFunctionName', {
             value: directSmsFunction.functionName,
             description: 'Lambda function name for direct SMS sending',
-            exportName: 'MarketingDirectSmsFunctionName',
+            exportName: 'SmartOutreachHubDirectSmsFunctionName',
         });
 
         new cdk.CfnOutput(this, 'SmsWebhookUrl', {
             value: `${api.url}webhook/sms`,
             description: 'API Gateway URL for SMS webhook',
-            exportName: 'MarketingSmsWebhookUrl',
+            exportName: 'SmartOutreachHubSmsWebhookUrl',
         });
 
         new cdk.CfnOutput(this, 'SendCampaignsApiUrl', {
             value: `${api.url}sms/campaigns`,
             description: 'API Gateway URL for sending campaigns',
-            exportName: 'MarketingSendCampaignsApiUrl',
+            exportName: 'SmartOutreachHubSendCampaignsApiUrl',
         });
 
         new cdk.CfnOutput(this, 'DirectSmsApiUrl', {
             value: `${api.url}sms/send`,
             description: 'API Gateway URL for direct SMS sending',
-            exportName: 'MarketingDirectSmsApiUrl',
+            exportName: 'SmartOutreachHubDirectSmsApiUrl',
         });
 
         // Bedrock Guardrail Outputs
         new cdk.CfnOutput(this, 'BedrockGuardrailId', {
             value: bedrockGuardrail.attrGuardrailId,
             description: 'Bedrock Guardrail ID for AI safety',
-            exportName: 'MarketingBedrockGuardrailId',
+            exportName: 'SmartOutreachHubBedrockGuardrailId',
         });
 
         new cdk.CfnOutput(this, 'BedrockGuardrailArn', {
             value: bedrockGuardrail.attrGuardrailArn,
             description: 'Bedrock Guardrail ARN for AI safety',
-            exportName: 'MarketingBedrockGuardrailArn',
+            exportName: 'SmartOutreachHubBedrockGuardrailArn',
         });
 
         new cdk.CfnOutput(this, 'BedrockGuardrailVersion', {
             value: bedrockGuardrailVersion.attrVersion,
             description: 'Bedrock Guardrail Version',
-            exportName: 'MarketingBedrockGuardrailVersion',
+            exportName: 'SmartOutreachHubBedrockGuardrailVersion',
         });
     }
 }
