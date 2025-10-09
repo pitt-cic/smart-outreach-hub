@@ -2,7 +2,7 @@
 
 from typing import Optional, Union
 
-from pydantic_ai.usage import Usage, UsageLimits
+from pydantic_ai.usage import RunUsage, UsageLimits
 from pydantic_core import ValidationError
 
 from agent.agent import sales_agent
@@ -94,7 +94,7 @@ async def process_message(
         )
 
         # Generate response using the AI agent
-        usage = Usage()
+        usage = RunUsage()
 
         async def run_agent():
             return await sales_agent.run(
@@ -127,8 +127,8 @@ async def process_message(
         return AgentResponseWrapper(
             **agent_response.model_dump(),
             campaign_id=campaign_id,
-            request_tokens=usage.request_tokens,
-            response_tokens=usage.response_tokens,
+            request_tokens=usage.input_tokens,
+            response_tokens=usage.output_tokens,
         )
 
     except ValidationError as e:
