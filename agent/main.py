@@ -36,6 +36,7 @@ async def process_message(
     Returns:
         The AI-generated response message
     """
+    campaign_id = None
     try:
         # Validate phone number format
         if not validate_phone_number(phone_number):
@@ -43,21 +44,6 @@ async def process_message(
             print(f"ERROR: {error_msg}")
             logfire.error("Invalid phone number", phone_number=phone_number)
             raise ValueError(error_msg)
-
-        is_valid, guardrails_response = apply_guardrails(incoming_message)
-        if not is_valid:
-            update_message_attributes(
-                incoming_message_id,
-                attributes={
-                    "guardrails_intervened": True,
-                    "user_sentiment": "negative",
-                },
-            )
-            return AgentResponseWrapper(
-                response_text=guardrails_response,
-                should_handoff=False,
-                guardrails_intervened=True,
-            )
 
         # Normalize phone number for consistent processing
         normalized_phone = normalize_phone_number(phone_number)
@@ -79,6 +65,22 @@ async def process_message(
                 phone_number=normalized_phone,
             )
             return None
+
+        is_valid, guardrails_response = apply_guardrails(incoming_message)
+        if not is_valid:
+            update_message_attributes(
+                incoming_message_id,
+                attributes={
+                    "guardrails_intervened": True,
+                    "user_sentiment": "negative",
+                },
+            )
+            return AgentResponseWrapper(
+                response_text=guardrails_response,
+                should_handoff=False,
+                guardrails_intervened=True,
+                campaign_id=campaign_id,
+            )
 
         # Get campaign-scoped conversation history (exclude current message) and convert to Pydantic AI message format
         conversation_history = get_conversation_history(normalized_phone, campaign_id)[
@@ -138,6 +140,7 @@ async def process_message(
         return AgentResponseWrapper(
             response_text="I'm experiencing high demand right now. Please try again in a few moments. Thanks for your patience! H2P! 🐾",
             should_handoff=False,
+            campaign_id=campaign_id,
         )
 
     except Exception as e:
@@ -166,6 +169,7 @@ async def process_message(
             agent_response = AgentResponseWrapper(
                 response_text="I'm experiencing high demand right now. Please try again in a few moments. Thanks for your patience! H2P! 🐾",
                 should_handoff=False,
+                campaign_id=campaign_id,
             )
         else:
             error_msg = f"Error processing message: {str(e)}"
@@ -180,6 +184,7 @@ async def process_message(
             agent_response = AgentResponseWrapper(
                 response_text="I apologize, but I'm experiencing technical difficulties. Please try again later.",
                 should_handoff=False,
+                campaign_id=campaign_id,
             )
 
         return agent_response
