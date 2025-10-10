@@ -331,7 +331,72 @@ Before deploying the Smart Outreach Hub solution, ensure you have the following 
 
 # Bill of Materials
 
-> To be updated
+## Pricing Structure
+
+### One-Time Setup Costs
+| Service                          | Description                                | Cost    |
+|----------------------------------|--------------------------------------------|---------|
+| **AWS End User Messaging Setup** | Phone number acquisition and configuration | $118.00 |
+
+### AWS Service Pricing
+| Service                              | Pricing Model                                         | Cost                            |
+|--------------------------------------|-------------------------------------------------------|---------------------------------|
+| **AWS Lambda**                       | \$0.20/1M requests + \$0.0000166667/GB-second         | Serverless compute              |
+| **Amazon API Gateway**               | \$3.50/1M requests                                    | First 333M REST API requests    |
+| **Amazon Cognito**                   | Free up to 10,000 MAUs, then \$0.015/MAU              | User authentication             |
+| **AWS Amplify**                      | \$0.01/build minute + \$0.15/GB storage               | Frontend hosting                |
+| **Amazon CloudWatch**                | \$0.50/GB ingested + \$0.03/GB stored                 | Logging & monitoring            |
+| **Amazon DynamoDB**                  | \$0.125/1M read requests + \$0.625/1M write requests  | NoSQL database operations       |
+| **AWS End User Messaging (SMS)**     | \$0.00883/outbound message & \$0.0075/inbound message | SMS Exchange operations         |
+| **Amazon Bedrock (Claude Sonnet 4)** | \$3.00/1M input tokens & \$15.00/1M output tokens     | AI processing for conversations |
+
+## Example Campaign: 30,000 Messages
+
+Based on a monthly campaign of 30,000 SMS messages with a 5% response rate (1,500 conversations) and an average of 5 message exchanges per conversation.
+
+### Cost Breakdown
+| Component              | Calculation                                  | Monthly Cost |
+|------------------------|----------------------------------------------|--------------|
+| **Outbound Messaging** | 30,000 × \$0.00883                           | \$264.90     |
+| **Inbound Messaging**  | 1,500 × \$0.0075                             | \$11.25      |
+| **AI Processing**      | 1,500 conversations × \$0.0435/conversation* | \$65.25      |
+| **AWS Services**       | Monthly AWS Service costs                    | $8.53        |
+| **Total**              |                                              | **$349.93**  |
+
+*AI cost per conversation breakdown:*
+- Input tokens: ~10,500 tokens × \$3.00/1M = \$0.0315
+- Output tokens: ~800 tokens × \$15.00/1M = \$0.012
+- Total per conversation: ~\$0.0435
+
+### AWS Services Monthly Costs
+| Service                     | Monthly Cost | Usage                | Notes                   |
+|-----------------------------|--------------|----------------------|-------------------------|
+| **AWS Lambda**              | ~\$2.00      | Function executions  | Based on actual metrics |
+| **Amazon API Gateway**      | ~\$3.00      | API requests         |                         |
+| **Amazon Cognito**          | ~\$2.00      | User authentication  |                         |
+| **AWS Amplify**             | ~\$1.00      | Frontend hosting     |                         |
+| **Amazon CloudWatch**       | ~\$0.50      | Logging & monitoring |                         |
+| **Amazon DynamoDB**         | ~$0.03       | Database operations  | Based on actual usage   |
+| **Total AWS Service Costs** | **$8.53**    |                      |                         |
+
+### Token Usage Details
+*Per conversation (five message exchanges):*
+- System prompt: 600 tokens
+- Campaign context: 1,000 tokens  
+- User messages: 250 tokens (5 × 50)
+- AI responses: 750 tokens (5 × 150)
+- Conversation history accumulation: ~7,900 tokens
+
+**Cost per message sent: $0.0117**
+
+## Scaling Considerations
+
+- **Higher response rates** will increase AI processing costs proportionally
+- **Longer conversations** will increase token usage and AI costs
+- **Message volume** scales linearly with SMS costs
+- **AWS Free Tier** may reduce costs for new accounts in the first 12 months
+
+For current AWS pricing information, visit the [AWS Pricing Calculator](https://calculator.aws).
 
 # Credits
 
