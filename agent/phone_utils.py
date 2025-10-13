@@ -63,3 +63,19 @@ def format_phone_number(phone_number: str) -> str:
         return phone_number
     except NumberParseException:
         return phone_number
+
+
+def mask_phone_number(phone_number: str) -> str:
+    """
+    Mask a normalized phone number for privacy, showing only the last 4 digits.
+
+    Args:
+        phone_number: Phone number in E.164 format
+    Returns:
+        Masked phone number (e.g., ***-***-5309)
+        Returns original string if too short to mask
+    """
+
+    if len(phone_number) >= 4:
+        return f"***-***-{phone_number[-4:]}"
+    return phone_number

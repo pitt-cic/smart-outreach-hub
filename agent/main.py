@@ -2,22 +2,19 @@
 
 from typing import Optional, Union
 
+from dynamodb.chat_history import ChatHistoryDDB
+from dynamodb.customer import CustomerDDB
+from dynamodb.models import CustomerStatus, UpdateChatMessageAttributes
+from guardrails import apply_guardrails
+from phone_utils import normalize_phone_number, validate_phone_number
 from pydantic_ai.usage import RunUsage, UsageLimits
 from pydantic_core import ValidationError
-
-from agent.agent import sales_agent
-from agent.models import AgentResponseWrapper, AgentContext
-from agent.utils import convert_history_to_messages
-from database import (
-    get_conversation_history,
-    get_or_create_customer,
-    update_customer_status,
-    update_message_attributes,
-)
-from guardrails import apply_guardrails
-from phone_utils import validate_phone_number, normalize_phone_number
 from pydantic_logging import logfire
 from retrier import exponential_backoff_retry
+
+from agent.agent import sales_agent
+from agent.models import AgentContext, AgentResponseWrapper
+from agent.utils import convert_history_to_messages
 
 usage_limits = UsageLimits(request_limit=50)
 
@@ -48,17 +45,17 @@ async def process_message(
         # Normalize phone number for consistent processing
         normalized_phone = normalize_phone_number(phone_number)
 
-        customer = get_or_create_customer(normalized_phone)
+        customer = CustomerDDB.get_or_create_customer(phone_number=normalized_phone)
 
         # Check customer status - only respond with AI if status is 'automated'
-        if customer["status"] != "automated":
+        if customer.status != CustomerStatus.AUTOMATED:
             logfire.info(
-                f"Customer status is {customer['status']}, not responding with AI"
+                f"Customer status is {customer.status}, not responding with AI"
             )
             return None
 
         # Check if customer has a campaign ID - required for AI processing
-        campaign_id = customer.get("most_recent_campaign_id")
+        campaign_id = customer.most_recent_campaign_id
         if not campaign_id:
             logfire.info(
                 "Customer has no campaign ID, skipping AI processing",
@@ -68,12 +65,11 @@ async def process_message(
 
         is_valid, guardrails_response = apply_guardrails(incoming_message)
         if not is_valid:
-            update_message_attributes(
+            ChatHistoryDDB.update_message_attributes(
                 incoming_message_id,
-                attributes={
-                    "guardrails_intervened": True,
-                    "user_sentiment": "negative",
-                },
+                attributes=UpdateChatMessageAttributes(
+                    guardrails_intervened=True, user_sentiment="negative"
+                ),
             )
             return AgentResponseWrapper(
                 response_text=guardrails_response,
@@ -83,16 +79,16 @@ async def process_message(
             )
 
         # Get campaign-scoped conversation history (exclude current message) and convert to Pydantic AI message format
-        conversation_history = get_conversation_history(normalized_phone, campaign_id)[
-            :-1
-        ]
+        conversation_history = ChatHistoryDDB.get_conversation_history(
+            normalized_phone, campaign_id, skip_last=True
+        )
         message_history = convert_history_to_messages(conversation_history)
 
         # Create context for the agent
         context = AgentContext(
             customer_phone_number=normalized_phone,
-            customer_name=f"{customer['first_name']} {customer['last_name']}",
-            most_recent_campaign_id=customer.get("most_recent_campaign_id"),
+            customer_name=f"{customer.first_name} {customer.last_name}",
+            most_recent_campaign_id=campaign_id,
         )
 
         # Generate response using the AI agent
@@ -113,17 +109,21 @@ async def process_message(
 
         # Check if human handoff is required
         if agent_response.should_handoff:
-            update_customer_status(normalized_phone, "needs_response")
+            CustomerDDB.update_customer_status(
+                normalized_phone, CustomerStatus.NEEDS_RESPONSE
+            )
             print("\n=== HUMAN HANDOFF TRIGGERED ===")
             print(f"To: {normalized_phone}")
-            print(f"Customer: {customer['first_name']} {customer['last_name']}")
+            print(f"Customer: {customer.first_name} {customer.last_name}")
             print(f"Reason: {agent_response.handoff_reason}")
             print("================================\n")
 
         if agent_response.user_sentiment:
-            update_message_attributes(
+            ChatHistoryDDB.update_message_attributes(
                 incoming_message_id,
-                attributes={"user_sentiment": agent_response.user_sentiment},
+                attributes=UpdateChatMessageAttributes(
+                    user_sentiment=agent_response.user_sentiment
+                ),
             )
 
         return AgentResponseWrapper(

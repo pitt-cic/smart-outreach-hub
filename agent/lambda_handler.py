@@ -7,10 +7,10 @@ import time
 from typing import Any, Dict, Optional
 
 import boto3
-
-from agent.models import AgentResponseWrapper
 from logging_config import setup_logging
 from main import process_message
+
+from agent.models import AgentResponseWrapper
 
 logger = setup_logging(__name__)
 

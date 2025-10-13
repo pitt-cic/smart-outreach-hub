@@ -2,49 +2,44 @@ import asyncio
 import json
 import sys
 import time
-from datetime import datetime
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
-from jinja2 import Environment, FileSystemLoader
-
-from test_utils.database import (
-    create_customer,
-    add_campaign_message,
-    initialize_database,
-    cleanup_test_data,
-    add_message_to_history,
+from dynamodb.campaign import CampaignDDB
+from dynamodb.chat_history import ChatHistoryDDB
+from dynamodb.customer import CustomerDDB
+from dynamodb.models import (
+    AddMessageInput,
+    CreateCampaignInput,
+    Customer,
+    CustomerStatus,
 )
+from jinja2 import Environment, FileSystemLoader
+from phone_utils import normalize_phone_number
+from test_utils.dynamodb import cleanup_test_data
 
 # Add parent directory to path to import main.py
 sys.path.append(str(Path(__file__).parent.parent))
 from main import process_message
 
 
+@dataclass
 class ConversationTest:
     """Individual conversation test case based on conversation-flows.md examples"""
 
-    def __init__(
-        self,
-        name: str,
-        description: str,
-        campaign_name: Optional[str] = None,
-        campaign: Optional[str] = None,
-        campaign_details: Optional[str] = None,
-        user_messages: List[str] = [],
-        phone_number: str = "+14445556666",
-    ):
-        self.name = name
-        self.description = description
-        self.campaign_name = campaign_name
-        self.campaign = campaign
-        self.campaign_details = campaign_details
-        self.user_messages = user_messages
-        self.results = []
-        self.duration = 0
-        self.success = True
-        self.error_messages = []
-        self.phone_number = phone_number
+    name: str
+    description: str
+    campaign_name: str | None = None
+    campaign: str | None = None
+    campaign_details: str | None = None
+    user_messages: list[str] = field(default_factory=list)
+    results: list = field(default_factory=list)
+    duration: float = 0
+    success: bool = True
+    error_messages: list[str] = field(default_factory=list)
+    phone_number: str = "+14445556666"
 
 
 with open("test_conversations.json", "r") as f:
@@ -88,39 +83,52 @@ async def run_conversation_test(
         campaign_id = None
         if test.campaign:
             print(f"  Campaign: {test.campaign[:50]}...")
-            campaign_id = add_campaign_message(
-                phone_number=test.phone_number,
-                campaign_name=test.campaign_name,
-                campaign_message=test.campaign,
-                campaign_details=test.campaign_details,
+            campaign_id = CampaignDDB.create_campaign(
+                campaign=CreateCampaignInput(
+                    name=test.campaign_name or "Test Campaign",
+                    message_template=test.campaign,
+                    campaign_details=test.campaign_details,
+                )
+            )
+
+            now = datetime.now(tz=timezone.utc).isoformat()
+            ChatHistoryDDB.add_message(
+                message=AddMessageInput(
+                    phone_number=test.phone_number,
+                    message=test.campaign,
+                    direction="outbound",
+                    timestamp=now,
+                    campaign_id=campaign_id,
+                    response_type="automated",
+                )
             )
             print(f"  Campaign Message Added: {test.campaign}")
 
-        create_customer(
-            phone_number=test.phone_number, most_recent_campaign_id=campaign_id
+        CustomerDDB.create_customer(
+            Customer(
+                phone_number=test.phone_number,
+                first_name="Test",
+                last_name="Customer",
+                status=CustomerStatus.AUTOMATED,
+                most_recent_campaign_id=campaign_id,
+            )
         )
 
-        # i = 0
-        # while True:
         for i in range(len(test.user_messages)):
             user_message = test.user_messages[i]
-
-            # user_message = input(f"Enter user message {f'(default: {test.user_messages[i]})' if i < len(test.user_messages) else ''} (q to quit): ")
-            # if not user_message.strip() and i < len(test.user_messages):
-            #     user_message = test.user_messages[i]
-            # if user_message.strip().lower() == 'q':
-            #     break
             message_number = i + 1
-            # i += 1
             print()
             print(f"  Using User Message {message_number}: {user_message}")
 
             # Add incoming user message to history
-            message_id = add_message_to_history(
-                phone_number=test.phone_number,
-                message=user_message,
-                direction="inbound",
-                campaign_id=campaign_id,
+            message_id = ChatHistoryDDB.add_message(
+                message=AddMessageInput(
+                    phone_number=test.phone_number,
+                    message=user_message,
+                    direction="inbound",
+                    timestamp=datetime.now(tz=timezone.utc).isoformat(),
+                    campaign_id=campaign_id,
+                )
             )
 
             # Use process_message for full integration testing
@@ -144,12 +152,16 @@ async def run_conversation_test(
 
             if agent_response:
                 # Add outbound agent response to history
-                add_message_to_history(
-                    phone_number=test.phone_number,
-                    message=agent_response.response_text,
-                    direction="outbound",
-                    response_type="ai_agent",
-                    guardrails_intervened=agent_response.guardrails_intervened,
+                ChatHistoryDDB.add_message(
+                    message=AddMessageInput(
+                        phone_number=test.phone_number,
+                        message=agent_response.response_text,
+                        direction="outbound",
+                        timestamp=datetime.now(tz=timezone.utc).isoformat(),
+                        campaign_id=campaign_id,
+                        response_type="ai_agent",
+                        guardrails_intervened=agent_response.guardrails_intervened,
+                    )
                 )
 
                 print(
@@ -202,7 +214,7 @@ async def run_all_tests(limit: int = None) -> List[ConversationTest]:
     tests_to_run = TEST_CONVERSATIONS[:num_tests]
 
     for i, test in enumerate(tests_to_run, 1):
-        test.phone_number = f"+1412555{i:04d}"
+        test.phone_number = normalize_phone_number(f"+1412555{i:04d}")
         print(f"Test {i}/{num_tests}: {test.name} (phone: {test.phone_number})")
 
     print("-" * 60)
@@ -425,7 +437,6 @@ def print_test_summary(results: List[ConversationTest]):
 
 async def main():
     """Main test runner"""
-    initialize_database()
 
     # Run all tests
     results = await run_all_tests()  # Set limit to run specific number of tests
