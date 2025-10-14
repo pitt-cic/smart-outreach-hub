@@ -2,19 +2,22 @@
 
 from typing import Optional, Union
 
+import constants
 from dynamodb.chat_history import ChatHistoryDDB
 from dynamodb.customer import CustomerDDB
 from dynamodb.models import CustomerStatus, UpdateChatMessageAttributes
 from guardrails import apply_guardrails
-from phone_utils import normalize_phone_number, validate_phone_number
+from logging_config import setup_logging
+from phone_utils import mask_phone_number, normalize_phone_number, validate_phone_number
 from pydantic_ai.usage import RunUsage, UsageLimits
 from pydantic_core import ValidationError
-from pydantic_logging import logfire
 from retrier import exponential_backoff_retry
 
 from agent.agent import sales_agent
 from agent.models import AgentContext, AgentResponseWrapper
 from agent.utils import convert_history_to_messages
+
+logger = setup_logging(__name__)
 
 usage_limits = UsageLimits(request_limit=50)
 
@@ -37,10 +40,7 @@ async def process_message(
     try:
         # Validate phone number format
         if not validate_phone_number(phone_number):
-            error_msg = f"Invalid phone number format: {phone_number}"
-            print(f"ERROR: {error_msg}")
-            logfire.error("Invalid phone number", phone_number=phone_number)
-            raise ValueError(error_msg)
+            raise ValueError(f"Invalid phone number format: {mask_phone_number(phone_number)}")
 
         # Normalize phone number for consistent processing
         normalized_phone = normalize_phone_number(phone_number)
@@ -49,17 +49,16 @@ async def process_message(
 
         # Check customer status - only respond with AI if status is 'automated'
         if customer.status != CustomerStatus.AUTOMATED:
-            logfire.info(
-                f"Customer status is {customer.status}, not responding with AI"
+            logger.info(
+                f"Customer {mask_phone_number(normalized_phone)} status is {customer.status}, not responding with AI"
             )
             return None
 
         # Check if customer has a campaign ID - required for AI processing
         campaign_id = customer.most_recent_campaign_id
         if not campaign_id:
-            logfire.info(
-                "Customer has no campaign ID, skipping AI processing",
-                phone_number=normalized_phone,
+            logger.info(
+                f"Customer {mask_phone_number(normalized_phone)} has no campaign ID, skipping AI processing"
             )
             return None
 
@@ -103,7 +102,6 @@ async def process_message(
                 usage_limits=usage_limits,
             )
 
-        print("Running agent")
         result = await exponential_backoff_retry(run_agent)
         agent_response = result.output
 
@@ -112,11 +110,9 @@ async def process_message(
             CustomerDDB.update_customer_status(
                 normalized_phone, CustomerStatus.NEEDS_RESPONSE
             )
-            print("\n=== HUMAN HANDOFF TRIGGERED ===")
-            print(f"To: {normalized_phone}")
-            print(f"Customer: {customer.first_name} {customer.last_name}")
-            print(f"Reason: {agent_response.handoff_reason}")
-            print("================================\n")
+            logger.info(
+                f"Human handoff triggered for {mask_phone_number(normalized_phone)}"
+            )
 
         if agent_response.user_sentiment:
             ChatHistoryDDB.update_message_attributes(
@@ -134,22 +130,14 @@ async def process_message(
         )
 
     except ValidationError as e:
-        print(f"ValidationError: {e}")
-        print(f"ValidationError: {e.error_count()}")
-        print(f"ValidationError: {e.errors()}")
+        logger.error(f"Validation error: {str(e)}", exc_info=True)
         return AgentResponseWrapper(
-            response_text="I'm experiencing high demand right now. Please try again in a few moments. Thanks for your patience! H2P! 🐾",
+            response_text=constants.TECHNICAL_DIFFICULTY_RESPONSE,
             should_handoff=False,
             campaign_id=campaign_id,
         )
 
     except Exception as e:
-        # Enhanced error handling for better debugging
-        if hasattr(e, "message"):
-            print(f"Message: {e.message}")
-        if hasattr(e, "body"):
-            print(f"Body: {e.body}")
-        error_type = type(e).__name__
         is_throttling = (
             "ThrottlingException" in str(e)
             or "Too many requests" in str(e)
@@ -158,31 +146,17 @@ async def process_message(
 
         if is_throttling:
             error_msg = f"API throttling error after retries: {str(e)}"
-            print(f"THROTTLING ERROR: {error_msg}")
-            logfire.error(
-                "API throttling error",
-                error=str(e),
-                error_type=error_type,
-                phone_number=phone_number,
-                is_throttling=True,
-            )
+            logger.error(error_msg, exc_info=True)
             agent_response = AgentResponseWrapper(
-                response_text="I'm experiencing high demand right now. Please try again in a few moments. Thanks for your patience! H2P! 🐾",
+                response_text=constants.HIGH_DEMAND_RESPONSE,
                 should_handoff=False,
                 campaign_id=campaign_id,
             )
         else:
             error_msg = f"Error processing message: {str(e)}"
-            print(f"ERROR: {error_msg}")
-            logfire.error(
-                "Message processing failed",
-                error=str(e),
-                error_type=error_type,
-                phone_number=phone_number,
-                is_throttling=False,
-            )
+            logger.error(error_msg, exc_info=True)
             agent_response = AgentResponseWrapper(
-                response_text="I apologize, but I'm experiencing technical difficulties. Please try again later.",
+                response_text=constants.TECHNICAL_DIFFICULTY_RESPONSE,
                 should_handoff=False,
                 campaign_id=campaign_id,
             )

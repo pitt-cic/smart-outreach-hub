@@ -67,10 +67,10 @@ def format_phone_number(phone_number: str) -> str:
 
 def mask_phone_number(phone_number: str) -> str:
     """
-    Mask a normalized phone number for privacy, showing only the last 4 digits.
+    Mask a phone number for privacy, showing only the last 4 digits.
 
     Args:
-        phone_number: Phone number in E.164 format
+        phone_number: Phone number
     Returns:
         Masked phone number (e.g., ***-***-5309)
         Returns original string if too short to mask
