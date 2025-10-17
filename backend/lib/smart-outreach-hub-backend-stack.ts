@@ -763,21 +763,6 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
             })
         );
 
-        const directSmsIntegration = new apigateway.LambdaIntegration(directSmsFunction, {
-            timeout: cdk.Duration.seconds(29),
-            proxy: true,
-        });
-
-        // SMS endpoints
-        const smsResource = api.root.addResource('sms');
-
-        // Direct SMS endpoint
-        const directSmsResource = smsResource.addResource('send');
-        directSmsResource.addMethod('POST', directSmsIntegration, {
-            authorizer: cognitoAuthorizer,
-            authorizationType: apigateway.AuthorizationType.COGNITO,
-        });
-
         // Webhook endpoint for inbound SMS (public - no auth)
         const webhookResource = api.root.addResource('webhook');
         const smsWebhookResource = webhookResource.addResource('sms');
