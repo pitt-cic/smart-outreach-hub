@@ -1,0 +1,5 @@
+# Base Query and Mutation types that will be extended by domain-specific schemas
+# Note: These are intentionally empty and will be extended by domain-specific schemas
+type Query
+
+type Mutation

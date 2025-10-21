@@ -326,3 +326,4 @@ agent/test_report.html
 !backend/lib
 # Include the frontend lib directory
 !frontend/src/lib
+/backend/.claude/

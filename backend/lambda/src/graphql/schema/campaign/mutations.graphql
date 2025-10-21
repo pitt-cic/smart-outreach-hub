@@ -1,0 +1,5 @@
+extend type Mutation {
+    createCampaign(input: CreateCampaignInput!): Campaign!
+    updateCampaign(input: UpdateCampaignInput!): Campaign!
+    sendCampaign(campaignId: ID!): Campaign!
+}

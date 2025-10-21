@@ -1,0 +1,4 @@
+extend type Mutation {
+    sendManualMessage(phoneNumber: String!, message: String!): ChatMessage!
+    simulateInboundMessage(phoneNumber: String!, message: String!): ChatMessage! #Get rid of this
+}

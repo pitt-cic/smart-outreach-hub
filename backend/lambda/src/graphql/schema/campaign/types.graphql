@@ -1,0 +1,22 @@
+type Campaign {
+    campaignId: ID!
+    name: String!
+    messageTemplate: String!
+    campaignDetails: String
+    totalContacts: Int!
+    sentCount: Int!
+    responseCount: Int!
+    positiveResponseCount: Int!
+    neutralResponseCount: Int!
+    negativeResponseCount: Int!
+    positiveResponseRate: Float!
+    neutralResponseRate: Float!
+    negativeResponseRate: Float!
+    positiveHandoffCount: Int!
+    neutralHandoffCount: Int!
+    negativeHandoffCount: Int!
+    firstResponsePositiveCount: Int!
+    firstResponseNeutralCount: Int!
+    firstResponseNegativeCount: Int!
+    createdAt: String!
+}

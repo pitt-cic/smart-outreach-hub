@@ -1,0 +1,5 @@
+enum ResponseType {
+    automated
+    manual
+    ai_agent
+}

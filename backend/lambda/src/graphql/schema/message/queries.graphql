@@ -1,0 +1,3 @@
+extend type Query {
+    getAllMessages(limit: Int): [ChatMessage!]!
+}

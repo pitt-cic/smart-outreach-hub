@@ -1,0 +1,16 @@
+input ContactInput {
+    firstName: String!
+    lastName: String!
+    phoneNumber: String!
+}
+
+input CreateCampaignInput {
+    name: String!
+    messageTemplate: String!
+    campaignDetails: String
+}
+
+input UpdateCampaignInput {
+    campaignId: ID!
+    campaignDetails: String
+}

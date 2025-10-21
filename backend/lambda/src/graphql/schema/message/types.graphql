@@ -1,0 +1,14 @@
+enum MessageDirection {
+    outbound
+    inbound
+}
+
+type ChatMessage {
+    id: ID!
+    phoneNumber: String!
+    campaignId: String
+    message: String!
+    direction: MessageDirection!
+    timestamp: String!
+    responseType: ResponseType
+}

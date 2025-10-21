@@ -1,0 +1,16 @@
+enum CustomerStatus {
+    automated
+    needs_response
+    agent_responding
+}
+
+type Customer {
+    phoneNumber: String!
+    firstName: String!
+    lastName: String!
+    mostRecentCampaignId: String
+    status: CustomerStatus!
+    createdAt: String!
+    updatedAt: String!
+    chatHistory: [ChatMessage!]!
+}

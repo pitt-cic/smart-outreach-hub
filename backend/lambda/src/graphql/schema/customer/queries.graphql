@@ -1,0 +1,7 @@
+extend type Query {
+    getCustomer(phoneNumber: String!): Customer
+    listCustomersNeedingResponse: [Customer!]!
+    listAllCustomers: [Customer!]!
+    getChatHistory(phoneNumber: String!): [ChatMessage!]!
+    getPrefilledMeetingMessage(phoneNumber: String!): String
+}

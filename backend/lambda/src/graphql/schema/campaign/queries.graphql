@@ -1,0 +1,4 @@
+extend type Query {
+    getCampaign(campaignId: ID!): Campaign
+    listCampaigns: [Campaign!]!
+}
