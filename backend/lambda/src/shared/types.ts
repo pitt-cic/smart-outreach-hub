@@ -1,3 +1,9 @@
+export interface LambdaHandlerResult {
+    statusCode: number;
+    body: string;
+    headers?: Record<string, string>;
+}
+
 export type CustomerStatus = 'automated' | 'needs_response' | 'agent_responding';
 export type MessageDirection = 'outbound' | 'inbound';
 export type ResponseType = 'automated' | 'manual' | "ai_agent";
