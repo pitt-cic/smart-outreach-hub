@@ -28,20 +28,25 @@ export async function processSQSRecord(record: SQSRecord): Promise<void> {
       return;
     }
 
-    // Handle legacy AI agent response format
-    const { phone_number, agent_response } = messageBody;
-
-    if (!phone_number || !agent_response) {
-      throw new Error('Missing phone_number or agent_response in SQS message');
+    // Check if this is an agent response message
+    if ('agent_response' === messageType) {
+      const { phoneNumber, agentResponse } = messageBody;
+  
+      if (!phoneNumber || !agentResponse) {
+        throw new Error('Missing phoneNumber or agentResponse in SQS message');
+      }
+  
+      // Extract the message text from the agent response
+      const message = agentResponse.response_text;
+      if (!message || message.trim().length === 0) {
+        throw new Error('Empty message in agent response');
+      }
+  
+      await processAgentResponse(phoneNumber, message, agentResponse);
     }
 
-    // Extract the message text from the agent response
-    const message = agent_response.response_text;
-    if (!message || message.trim().length === 0) {
-      throw new Error('Empty message in agent response');
-    }
-
-    await processAgentResponse(phone_number, message, agent_response);
+    // Throw error for unknown message types
+    throw new Error(`Unknown message type: ${messageType}`);
   } catch (error) {
     logError('Error processing SQS record', error);
     throw error; // This will cause SQS to retry

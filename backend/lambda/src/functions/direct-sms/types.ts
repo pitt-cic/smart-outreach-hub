@@ -31,16 +31,13 @@ export interface ManualMessage {
 }
 
 export interface SQSMessageBody {
-  phone_number?: string;
-  agent_response?: AgentResponse;
-  campaign_id?: string;
-  timestamp?: number;
-  // New fields for personalized campaigns
   phoneNumber?: string;
+  agentResponse?: AgentResponse;
   message?: string;
   campaignId?: string;
   customerId?: string;
   messageType?: 'campaign' | 'manual';
+  timestamp?: number;
 }
 
 export interface SMSResult {

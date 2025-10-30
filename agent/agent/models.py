@@ -36,7 +36,7 @@ class AgentResponseWrapper(AgentResponse):
     guardrails_intervened: bool = False
     request_tokens: int = 0
     response_tokens: int = 0
-    campaign_id: str
+    campaign_id: str | None = None
 
     def as_dict(self) -> dict:
         """Return a dictionary of all fields and their values"""
