@@ -167,24 +167,6 @@ async function processAgentResponse(phoneNumber: string, message: string, agentR
 
     const normalizedPhone = normalizePhoneNumber(phoneNumber);
 
-    // TODO: Revisit this -Update customer status to indicate agent is responding
-    // This is handled by the AI Agent Lambda function
-    // let customer = await CustomerModel.findByPhoneNumber(normalizedPhone);
-    // if (!customer) {
-    //     customer = await CustomerModel.create({
-    //         phone_number: normalizedPhone,
-    //         first_name: 'Unknown',
-    //         last_name: 'Customer',
-    //         status: 'agent_responding',
-    //     });
-    //     logInfo('Created new customer record', { phoneNumber: normalizedPhone });
-    // } else {
-    //     await CustomerModel.update(normalizedPhone, {
-    //         status: 'agent_responding',
-    //         updated_at: new Date().toISOString()
-    //     });
-    // }
-
     // Send SMS via AWS End User Messaging
     const smsResult = await SMSService.sendSMS(normalizedPhone, message);
 
