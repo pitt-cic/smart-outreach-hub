@@ -1,4 +1,5 @@
 import {isValidPhoneNumber, parsePhoneNumberFromString} from 'libphonenumber-js';
+import {RESPONSE_HEADERS} from './constants';
 import {LambdaHandlerResult} from './types';
 
 // Re-export initializeDatabase from database module
@@ -87,12 +88,7 @@ export function createSuccessResponse(data: any, statusCode: number = 200, exclu
         return response;
     }
 
-    response.headers = {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT,DELETE'
-    };
+    response.headers = RESPONSE_HEADERS;
     
     return response;
 }
@@ -111,12 +107,7 @@ export function createErrorResponse(message: string, statusCode: number = 500, d
         return response;
     }
 
-    response.headers = {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT,DELETE'
-    };
+    response.headers = RESPONSE_HEADERS;
 
     return response;
 }
