@@ -2,7 +2,7 @@ import { SQSRecord } from 'aws-lambda';
 import { CampaignCustomerModel, CampaignModel, ChatMessageModel } from '../../shared/dynamodb';
 import { logError, logInfo, logWarn } from '../../shared/log-utils';
 import { CampaignMetrics, UserSentiment } from '../../shared/types';
-import { maskPhoneNumber, normalizePhoneNumber, validatePhoneNumber } from '../../shared/utils';
+import { normalizePhoneNumber, validatePhoneNumber } from '../../shared/utils';
 import { SMSService } from './services/sms-service';
 import { AgentResponse, CampaignMessage, ManualMessage, SQSMessageBody } from './types';
 
@@ -58,13 +58,14 @@ async function processCampaignMessage(message: CampaignMessage): Promise<void> {
     const { phoneNumber, message: messageText, campaignId } = message;
 
     logInfo('Processing campaign message (unified or personalized)', {
-      phoneNumber: maskPhoneNumber(phoneNumber),
+      phoneNumber: phoneNumber,
       campaignId,
       messageLength: messageText.length,
     });
 
     if (!validatePhoneNumber(phoneNumber)) {
-      throw new Error(`Invalid phone number format: ${maskPhoneNumber(phoneNumber)}`);
+      logError('Invalid phone number format', { phoneNumber: phoneNumber });
+      throw new Error('Invalid phone number format');
     }
 
     const normalizedPhone = normalizePhoneNumber(phoneNumber);
@@ -90,13 +91,13 @@ async function processCampaignMessage(message: CampaignMessage): Promise<void> {
     try {
       await CampaignCustomerModel.updateStatus(campaignId, normalizedPhone, campaignCustomerStatus);
       logInfo('Updated campaign-customer status', {
-        phoneNumber: maskPhoneNumber(normalizedPhone),
+        phoneNumber: normalizedPhone,
         campaignId,
         status: campaignCustomerStatus,
       });
     } catch (updateError) {
       logError('Failed to update campaign-customer status', {
-        phoneNumber: maskPhoneNumber(normalizedPhone),
+        phoneNumber: normalizedPhone,
         campaignId,
         status: campaignCustomerStatus,
         error: updateError instanceof Error ? updateError.message : 'Unknown error',
@@ -105,7 +106,7 @@ async function processCampaignMessage(message: CampaignMessage): Promise<void> {
     }
 
     logInfo('Campaign SMS processed successfully', {
-      phoneNumber: maskPhoneNumber(normalizedPhone),
+      phoneNumber: normalizedPhone,
       campaignId,
       messageId: smsResult.messageId,
       success: smsResult.success,
@@ -128,13 +129,14 @@ async function processCampaignMessage(message: CampaignMessage): Promise<void> {
 async function processManualMessage(message: ManualMessage): Promise<void> {
   try {
     logInfo('Processing manual message', {
-      phoneNumber: maskPhoneNumber(message.phoneNumber),
+      phoneNumber: message.phoneNumber,
       messageId: message.messageId,
       messageLength: message.message.length,
     });
 
     if (!validatePhoneNumber(message.phoneNumber)) {
-      throw new Error(`Invalid phone number format: ${maskPhoneNumber(message.phoneNumber)}`);
+      logError('Invalid phone number format', { phoneNumber: message.phoneNumber });
+      throw new Error('Invalid phone number format');
     }
 
     const normalizedPhone = normalizePhoneNumber(message.phoneNumber);
@@ -143,7 +145,7 @@ async function processManualMessage(message: ManualMessage): Promise<void> {
     const smsResult = await SMSService.sendSMS(normalizedPhone, message.message);
 
     logInfo('Manual SMS processed successfully', {
-      phoneNumber: maskPhoneNumber(normalizedPhone),
+      phoneNumber: normalizedPhone,
       messageId: message.messageId,
       externalMessageId: smsResult.messageId,
       success: smsResult.success,

@@ -1,7 +1,6 @@
 import { PinpointSMSVoiceV2Client, SendTextMessageCommand } from '@aws-sdk/client-pinpoint-sms-voice-v2';
 import { logError, logInfo } from '../../../shared/log-utils';
 import { SMSResult } from '../types';
-import { maskPhoneNumber } from '../../../shared/utils';
 
 const pinpointClient = new PinpointSMSVoiceV2Client({ region: process.env.AWS_REGION });
 
@@ -13,7 +12,7 @@ export class SMSService {
       }
 
       logInfo('Sending SMS via End User Messaging', {
-        phoneNumber: maskPhoneNumber(phoneNumber),
+        phoneNumber: phoneNumber,
         messageLength: message.length,
       });
 
@@ -27,7 +26,7 @@ export class SMSService {
       );
 
       logInfo('SMS sent successfully', {
-        phoneNumber: maskPhoneNumber(phoneNumber),
+        phoneNumber: phoneNumber,
         messageId: result.MessageId,
       });
 
@@ -40,7 +39,7 @@ export class SMSService {
       };
 
       logError('Failed to send SMS', {
-        phoneNumber: maskPhoneNumber(phoneNumber),
+        phoneNumber: phoneNumber,
         ...errorDetails,
       });
 
