@@ -1,7 +1,96 @@
 extend type Query {
-    getCustomer(phoneNumber: String!): Customer
+    """
+    Retrieves a single customer record by their phone number.
+
+    Returns null if no customer exists with the given phone number.
+
+    **Example:**
+    ```graphql
+    query {
+        getCustomer(phoneNumber: "+12345678900") {
+            phoneNumber
+            firstName
+            lastName
+            status
+            chatHistory {
+                message
+                timestamp
+            }
+        }
+    }
+    ```
+    """
+    getCustomer(
+        """
+        The customer's phone number in E.164 format (e.g., +12345678900).
+        Must include country code with + prefix.
+        """
+        phoneNumber: String!
+    ): Customer
+
+    """
+    Retrieves all customers with status 'needs_response'.
+
+    This query is used to populate agent dashboards showing customers
+    who require immediate attention or response. Results are typically
+    sorted by most recent message timestamp.
+
+    **Use case:** Agent task queue, priority inbox
+    """
     listCustomersNeedingResponse: [Customer!]!
+
+    """
+    Retrieves all customers in the system regardless of status.
+
+    **Warning:** This query can return large result sets. Consider adding
+    pagination in future iterations for production use at scale.
+
+    **Use case:** Admin dashboards, reporting, bulk operations
+    """
     listAllCustomers: [Customer!]!
-    getChatHistory(phoneNumber: String!): [ChatMessage!]!
-    getPrefilledMeetingMessage(phoneNumber: String!): String
+
+    """
+    Retrieves the complete message history for a specific customer.
+
+    Messages are returned in chronological order (oldest to newest) and
+    include both inbound and outbound communications across all campaigns.
+
+    **Example:**
+    ```graphql
+    query {
+        getChatHistory(phoneNumber: "+12345678900") {
+            id
+            message
+            direction
+            timestamp
+            responseType
+        }
+    }
+    ```
+    """
+    getChatHistory(
+        """
+        The customer's phone number in E.164 format (e.g., +12345678900).
+        """
+        phoneNumber: String!
+    ): [ChatMessage!]!
+
+    """
+    Generates a pre-filled meeting invitation message for a customer.
+
+    This message is customized based on the customer's interaction history
+    and current conversation context. Agents can use this as a template
+    when scheduling meetings with interested customers.
+
+    Returns null if the customer doesn't exist or if meeting context
+    cannot be generated.
+
+    **Use case:** Quick meeting scheduling, automated follow-ups
+    """
+    getPrefilledMeetingMessage(
+        """
+        The customer's phone number in E.164 format (e.g., +12345678900).
+        """
+        phoneNumber: String!
+    ): String
 }

@@ -1,8 +1,9 @@
 import {Resolvers} from '../types/generated';
-import {customerQueries, customerMutations, customerFields} from './customer';
-import {campaignQueries, campaignMutations} from './campaign';
-import {messageQueries} from './message';
+import {customerFields, customerMutations, customerQueries} from './customer';
+import {campaignMutations, campaignQueries} from './campaign';
+import {messageMutations, messageQueries} from './message';
 import {sharedMutations} from './shared/mutations';
+
 
 export const resolvers: Resolvers = {
     Query: {
@@ -14,6 +15,7 @@ export const resolvers: Resolvers = {
     Mutation: {
         ...customerMutations,
         ...campaignMutations,
+        ...messageMutations,
         ...sharedMutations,
     },
 

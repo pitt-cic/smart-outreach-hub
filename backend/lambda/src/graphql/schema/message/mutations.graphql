@@ -1,4 +1,49 @@
 extend type Mutation {
-    sendManualMessage(phoneNumber: String!, message: String!): ChatMessage!
-    simulateInboundMessage(phoneNumber: String!, message: String!): ChatMessage! #Get rid of this
+    """
+    Sends a manual message from a human agent to a customer.
+
+    This mutation is used when an agent wants to send a custom message outside
+    of the automated flow. The message is marked with responseType: manual
+    and direction: outbound.
+
+    **Key behaviors:**
+    - Message is sent immediately
+    - Customer's status may be automatically updated to agent_responding
+    - Message is added to the customer's chat history
+    - Automated responses are typically suspended while agent is active
+
+    **Example:**
+    ```graphql
+    mutation {
+        sendManualMessage(
+            phoneNumber: "+12345678900"
+            message: "Thanks for your interest! I'd love to schedule a call. Are you available tomorrow at 2pm?"
+        ) {
+            id
+            phoneNumber
+            message
+            direction
+            responseType
+            timestamp
+        }
+    }
+    ```
+
+    **Use case:** Agent-initiated conversations, follow-ups, customer support
+
+    **Important:** Ensure the agent has claimed this customer (status: agent_responding)
+    before sending manual messages to avoid conflicts with automated systems.
+    """
+    sendManualMessage(
+        """
+        The customer's phone number in E.164 format (e.g., +12345678900).
+        """
+        phoneNumber: String!
+
+        """
+        The text message to send to the customer.
+        Should be professional, clear, and actionable.
+        """
+        message: String!
+    ): ChatMessage!
 }

@@ -495,7 +495,6 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
                         'cp -r dist/* /asset-output/ && ' +
                         'mkdir -p /asset-output/graphql && ' +
                         'cp -r src/graphql/schema /asset-output/graphql/ && ' +
-                        'npm install --production --cache /tmp/.npm --no-audit --no-fund && ' +
                         'cp -r node_modules /asset-output/ && ' +
                         'cp package.json /asset-output/'
                     ],
@@ -574,7 +573,6 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
                         'npm install --cache /tmp/.npm --no-audit --no-fund && ' +
                         'npm run build && ' +
                         'cp -r dist/* /asset-output/ && ' +
-                        'npm install --production --cache /tmp/.npm --no-audit --no-fund && ' +
                         'cp -r node_modules /asset-output/ && ' +
                         'cp package.json /asset-output/'
                     ],
@@ -660,7 +658,6 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
                         'npm install --cache /tmp/.npm --no-audit --no-fund && ' +
                         'npm run build && ' +
                         'cp -r dist/* /asset-output/ && ' +
-                        'npm install --production --cache /tmp/.npm --no-audit --no-fund && ' +
                         'cp -r node_modules /asset-output/ && ' +
                         'cp package.json /asset-output/'
                     ],
@@ -712,7 +709,6 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
                         'npm install --cache /tmp/.npm --no-audit --no-fund && ' +
                         'npm run build && ' +
                         'cp -r dist/* /asset-output/ && ' +
-                        'npm install --production --cache /tmp/.npm --no-audit --no-fund && ' +
                         'cp -r node_modules /asset-output/ && ' +
                         'cp package.json /asset-output/'
                     ],

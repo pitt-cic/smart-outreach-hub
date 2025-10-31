@@ -1,5 +1,98 @@
 extend type Mutation {
-    createCampaign(input: CreateCampaignInput!): Campaign!
-    updateCampaign(input: UpdateCampaignInput!): Campaign!
-    sendCampaign(campaignId: ID!): Campaign!
+    """
+    Creates a new outreach campaign.
+
+    This initializes a new campaign with the provided name, message template,
+    and optional details. The campaign is created in a draft state with all
+    metrics initialized to zero. Use the sendCampaign mutation to actually
+    dispatch messages to contacts.
+
+    **Example:**
+    ```graphql
+    mutation {
+        createCampaign(input: {
+            name: "Q1 Product Launch"
+            messageTemplate: "Hi {firstName}, we're excited to announce..."
+            campaignDetails: "Targeting existing customers for new feature launch"
+        }) {
+            campaignId
+            name
+            messageTemplate
+            totalContacts
+            createdAt
+        }
+    }
+    ```
+
+    **Workflow:** Create campaign → Add contacts → Send campaign
+    """
+    createCampaign(
+        """
+        Input object containing campaign configuration.
+        """
+        input: CreateCampaignInput!
+    ): Campaign!
+
+    """
+    Updates an existing campaign's details.
+
+    Currently supports updating the campaignDetails field only.
+    Cannot modify the campaign name or message template after creation
+    to maintain audit integrity.
+
+    **Example:**
+    ```graphql
+    mutation {
+        updateCampaign(input: {
+            campaignId: "camp_123456"
+            campaignDetails: "Updated targeting criteria: focus on high-value customers"
+        }) {
+            campaignId
+            campaignDetails
+            updatedAt
+        }
+    }
+    ```
+
+    **Note:** This mutation does not affect campaign metrics or sent messages.
+    """
+    updateCampaign(
+        """
+        Input object containing campaign ID and fields to update.
+        """
+        input: UpdateCampaignInput!
+    ): Campaign!
+
+    """
+    Sends messages to all contacts in the specified campaign.
+
+    This mutation triggers the actual message delivery process. Messages are
+    sent asynchronously, and the campaign's sentCount will increment as
+    messages are successfully delivered.
+
+    **Important considerations:**
+    - Messages are sent immediately; there is no undo
+    - Rate limiting is applied based on messaging provider limits
+    - Campaign metrics will begin updating as responses are received
+
+    **Example:**
+    ```graphql
+    mutation {
+        sendCampaign(campaignId: "camp_123456") {
+            campaignId
+            name
+            totalContacts
+            sentCount
+        }
+    }
+    ```
+
+    **Workflow:** Create campaign → Add contacts → **Send campaign** → Monitor responses
+    """
+    sendCampaign(
+        """
+        The unique identifier of the campaign to send.
+        """
+        campaignId: ID!
+    ): Campaign!
 }

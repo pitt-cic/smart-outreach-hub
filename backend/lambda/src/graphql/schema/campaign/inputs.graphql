@@ -1,16 +1,74 @@
+"""
+Input type for adding a contact to a campaign.
+Each contact must have complete name and phone information.
+"""
 input ContactInput {
+    """
+    The contact's first name.
+    Used for message personalization (e.g., {firstName} placeholders).
+    """
     firstName: String!
+
+    """
+    The contact's last name.
+    Used for formal communications and record keeping.
+    """
     lastName: String!
+
+    """
+    The contact's phone number in E.164 format (e.g., +12345678900).
+    Must include country code with + prefix.
+    """
     phoneNumber: String!
 }
 
+"""
+Input type for creating a new campaign.
+Defines the campaign structure and initial message template.
+"""
 input CreateCampaignInput {
+    """
+    Human-readable name for the campaign.
+    Should be descriptive and unique (e.g., "Q1 2024 Product Launch").
+    """
     name: String!
+
+    """
+    The message template for initial outreach.
+
+    Supports personalization tokens:
+    - {firstName} - Contact's first name
+    - {lastName} - Contact's last name
+
+    Example: "Hi {firstName}, we're reaching out to share..."
+    """
     messageTemplate: String!
+
+    """
+    Optional additional context about this campaign.
+
+    Can include:
+    - Campaign objectives and goals
+    - Target audience description
+    - Special instructions for agents
+    - Links to related resources
+    """
     campaignDetails: String
 }
 
+"""
+Input type for updating an existing campaign.
+Currently only supports updating campaign details.
+"""
 input UpdateCampaignInput {
+    """
+    The unique identifier of the campaign to update.
+    """
     campaignId: ID!
+
+    """
+    Updated campaign details and context.
+    Replaces the existing campaignDetails value.
+    """
     campaignDetails: String
 }

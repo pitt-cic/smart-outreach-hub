@@ -1,3 +1,36 @@
 extend type Mutation {
+    """
+    Deletes all data from the system including customers, campaigns, and messages.
+
+    **⚠️ DANGER: This operation is irreversible and destructive.**
+
+    This mutation is intended for:
+    - Development and testing environments
+    - Demo resets between presentations
+    - Complete system cleanup during troubleshooting
+
+    **NEVER use this in production unless you are absolutely certain.**
+
+    Returns `true` if the operation completed successfully.
+
+    **Example:**
+    ```graphql
+    mutation {
+        clearAllData
+    }
+    ```
+
+    **What gets deleted:**
+    - All customer records and their associated data
+    - All campaign records and metrics
+    - All chat messages and conversation history
+    - All related metadata and relationships
+
+    **Recommended safeguards:**
+    - Require additional confirmation in the UI
+    - Implement environment-based restrictions
+    - Add audit logging for compliance
+    - Consider soft-delete patterns for production
+    """
     clearAllData: Boolean!
 }

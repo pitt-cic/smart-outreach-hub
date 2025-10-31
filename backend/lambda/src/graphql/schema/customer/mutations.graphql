@@ -1,3 +1,46 @@
 extend type Mutation {
-    updateCustomerStatus(phoneNumber: String!, status: CustomerStatus!): Customer!
+    """
+    Updates the status of a customer in the outreach workflow.
+
+    This mutation is typically called when:
+    - An agent takes over a conversation (status: agent_responding)
+    - An agent hands back a customer to automation (status: automated)
+    - A message requires review (status: needs_response)
+
+    The mutation returns the updated Customer object with the new status
+    and updated timestamp.
+
+    **Example:**
+    ```graphql
+    mutation {
+    updateCustomerStatus(
+    phoneNumber: "+12345678900"
+    status: agent_responding
+    ) {
+    phoneNumber
+    firstName
+    lastName
+    status
+    updatedAt
+    }
+    }
+    ```
+
+    **Common workflows:**
+    - automated → needs_response (triggered by customer reply)
+    - needs_response → agent_responding (agent claims conversation)
+    - agent_responding → automated (agent releases conversation)
+    """
+    updateCustomerStatus(
+        """
+        The customer's phone number in E.164 format (e.g., +12345678900).
+        """
+        phoneNumber: String!
+
+        """
+        The new status to set for this customer.
+        Must be one of: automated, needs_response, agent_responding
+        """
+        status: CustomerStatus!
+    ): Customer!
 }
