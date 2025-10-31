@@ -4,6 +4,12 @@ export interface LambdaHandlerResult {
     headers?: Record<string, string>;
 }
 
+export interface HandleSQSEventResult {
+  itemIdentifier: string;
+  success: boolean;
+  error?: string;
+}
+
 export type CustomerStatus = 'automated' | 'needs_response' | 'agent_responding';
 export type MessageDirection = 'outbound' | 'inbound';
 export type ResponseType = 'automated' | 'manual' | "ai_agent";

@@ -1,11 +1,5 @@
 import { UserSentiment } from '../../shared/types';
 
-export interface HandleSQSEventResult {
-  itemIdentifier: string;
-  success: boolean;
-  error?: string;
-}
-
 export interface AgentResponse {
   response_text: string;
   should_handoff: boolean;

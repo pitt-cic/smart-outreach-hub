@@ -1,8 +1,7 @@
 import { SQSEvent } from 'aws-lambda';
 import { logError } from '../../shared/log-utils';
-import { LambdaHandlerResult } from '../../shared/types';
+import { HandleSQSEventResult, LambdaHandlerResult } from '../../shared/types';
 import { createErrorResponse, createSuccessResponse } from '../../shared/utils';
-import { HandleSQSEventResult } from './types';
 import { processSQSRecord } from './utils';
 
 export const handler = async (event: SQSEvent): Promise<LambdaHandlerResult> => {
