@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Literal
 
+from custom_types import DictMixin
+
 
 class CustomerStatus(StrEnum):
     AUTOMATED = "automated"
@@ -13,19 +15,6 @@ class UserSentiment(StrEnum):
     POSITIVE = "positive"
     NEUTRAL = "neutral"
     NEGATIVE = "negative"
-
-
-class DictMixin:
-    """Mixin to convert dataclass to dictionary"""
-
-    def as_dict(self):
-        """Convert the dataclass to a dictionary, excluding None values."""
-        return {
-            field: getattr(self, field)
-            for field in self.__class__.__dataclass_fields__
-            if getattr(self, field) is not None
-        }
-
 
 @dataclass
 class Customer(DictMixin):

@@ -2,153 +2,64 @@
 
 import asyncio
 import json
-import os
-import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
-import boto3
+from constants import TECHNICAL_DIFFICULTY_RESPONSE
 from logging_config import setup_logging
 from main import process_message
+from sqs_utils import send_to_outbound_sms_queue
 
 from agent.models import AgentResponseWrapper
 
 logger = setup_logging(__name__)
 
-# Initialize SQS client
-sqs = boto3.client("sqs")
-OUTBOUND_SMS_QUEUE_URL = os.environ.get("OUTBOUND_SMS_QUEUE_URL")
 
-
-def send_to_outbound_sms_queue(
-    phone_number: str, agent_response: Optional[AgentResponseWrapper]
-) -> bool:
-    """
-    Send AgentResponseWrapper to outbound SMS queue for processing
-
-    Args:
-        phone_number: The recipient phone number
-        message_id: The ID of the incoming message
-        agent_response: The complete AgentResponseWrapper object from the AI agent
-
-    Returns:
-        bool: True if message was successfully queued, False otherwise
-    """
-    if not OUTBOUND_SMS_QUEUE_URL:
-        logger.error("OUTBOUND_SMS_QUEUE_URL environment variable not set")
-        return False
-
-    if not agent_response:
-        logger.error("Agent response is None, not sending to outbound SMS queue")
-        return False
-
-    try:
-        message_body = {
-            "phone_number": phone_number,
-            "agent_response": agent_response.as_dict(),
-            "campaign_id": agent_response.campaign_id,
-            "timestamp": time.time(),
-        }
-
-        message_attributes = {
-            "phone_number": {"StringValue": phone_number, "DataType": "String"},
-            "message_type": {"StringValue": "agent_response", "DataType": "String"},
-        }
-
-        # Add campaign_id to message attributes if provided
-        if agent_response.campaign_id:
-            message_attributes["campaign_id"] = {
-                "StringValue": agent_response.campaign_id,
-                "DataType": "String",
-            }
-
-        response = sqs.send_message(
-            QueueUrl=OUTBOUND_SMS_QUEUE_URL,
-            MessageBody=json.dumps(message_body),
-            MessageAttributes=message_attributes,
-        )
-
-        logger.info(f"Message queued successfully. MessageId: {response['MessageId']}")
-        return True
-
-    except Exception as e:
-        logger.error(f"Failed to send message to SQS queue: {str(e)}", exc_info=True)
-        return False
-
-
-def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
+def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
     """
     AWS Lambda handler for the sales AI Agent
 
-    Handles both API Gateway events and direct invocations
+    Handles direct invocations
+
+    Args:
+        event: The event dictionary containing phone_number, message, and message_id
+        _: The context object (not used)
+    
+    Returns:
+        The response dictionary with status code and body
     """
 
     try:
         logger.info(f"Lambda invocation - Event: {json.dumps(event, default=str)}")
 
-        # Handle direct Lambda invocations
-        if "phone_number" in event and "message" in event:
-            return handle_direct_invocation(event, context)
-
-        # Handle health check
-        elif event.get("path") == "/agent/health":
-            return {
-                "statusCode": 200,
-                "headers": {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                    "Access-Control-Allow-Headers": "Content-Type, X-Amz-Date, Authorization, X-Api-Key",
-                },
-                "body": json.dumps(
-                    {
-                        "status": "healthy",
-                        "service": "Sales AI Agent",
-                        "timestamp": context.aws_request_id if context else "local",
-                    }
-                ),
-            }
-
-        else:
-            return {
-                "statusCode": 400,
-                "headers": {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                },
-                "body": json.dumps(
-                    {
-                        "error": "Invalid event format. Expected httpMethod or phone_number/message fields."
-                    }
-                ),
-            }
+        for key in ["phone_number", "message", "message_id"]:
+            if key not in event:
+                raise ValueError(f"Missing required field: {key}")
+        
+        return process_message_sync(
+            phone_number=event["phone_number"],
+            message=event["message"],
+            message_id=event["message_id"],
+        )
 
     except Exception as e:
         logger.error(f"Lambda handler error: {str(e)}", exc_info=True)
         return {
             "statusCode": 500,
-            "headers": {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-            },
             "body": json.dumps({"error": "Internal server error", "message": str(e)}),
         }
 
 
-def handle_direct_invocation(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
-    """Handle direct Lambda invocations"""
-
-    phone_number = event["phone_number"]
-    message = event["message"]
-    message_id = event["message_id"]
-
-    return process_message_sync(phone_number, message, message_id, context)
-
-
-def process_message_sync(
-    phone_number: str, message: str, message_id: str, context: Any
-) -> Dict[str, Any]:
+def process_message_sync(phone_number: str, message: str, message_id: str) -> Dict[str, Any]:
     """
     Synchronous wrapper for the async process_message function
+
+    Args:
+        phone_number: The customer's phone number
+        message: The message received from the customer
+        message_id: The ID of the incoming message
+    
+    Returns:
+        The response dictionary with status code and body
     """
 
     try:
@@ -165,22 +76,17 @@ def process_message_sync(
 
             logger.info(f"AI response generated: {response}")
 
-            # Send the entire AgentResponseWrapper to the outbound SMS queue
-            queue_success = send_to_outbound_sms_queue(phone_number, response)
+            queue_success, queue_timestamp = send_to_outbound_sms_queue(phone_number, response)
 
             return {
                 "statusCode": 200,
-                "headers": {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                },
                 "body": json.dumps(
                     {
                         "phone_number": phone_number,
                         "incoming_message": message,
                         "ai_response": response.as_dict() if response else None,
                         "sms_queued": queue_success,
-                        "timestamp": context.aws_request_id if context else "local",
+                        "timestamp": queue_timestamp,
                     }
                 ),
             }
@@ -191,25 +97,24 @@ def process_message_sync(
     except Exception as e:
         logger.error(f"Message processing error: {str(e)}", exc_info=True)
 
-        # Check if it's a throttling error for better user feedback
-        if "ThrottlingException" in str(e) or "Too many requests" in str(e):
-            error_message = "I'm experiencing high demand right now. Please try again in a few moments. Thanks for your patience! H2P! 🐾"
-        else:
-            error_message = "I apologize, but I'm experiencing technical difficulties. Please try again later."
-
+        agent_response = AgentResponseWrapper(
+            response_text=TECHNICAL_DIFFICULTY_RESPONSE,
+            should_handoff=True,
+            handoff_reason="System error",
+        )
+        
+        queue_success, queue_timestamp = send_to_outbound_sms_queue(phone_number, agent_response)
+        
         return {
             "statusCode": 500,
-            "headers": {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-            },
             "body": json.dumps(
                 {
-                    "error": "Message processing failed",
-                    "ai_response": error_message,
+                    "error": f"Message processing failed: {str(e)}",
                     "phone_number": phone_number,
                     "incoming_message": message,
-                    "details": str(e),
+                    "ai_response": agent_response.as_dict(),
+                    "sms_queued": queue_success,
+                    "timestamp": queue_timestamp,
                 }
             ),
         }
