@@ -1,9 +1,31 @@
-import { dynamoDBDocumentClient, getTableName } from './client';
+import { dynamoDBDocumentClient, getTableName, TABLES } from './client';
 
+import { DescribeTableCommand } from '@aws-sdk/client-dynamodb';
 import { DeleteCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { logError, logInfo } from '../log-utils';
 
 export class DatabaseUtils {
+
+  static async checkConnectionToDynamoDB(tables?: (keyof typeof TABLES)[]): Promise<void> {
+    const targetTables = tables || Object.keys(TABLES);
+    for (let table of targetTables) {
+      try {
+        const response = await dynamoDBDocumentClient.send(new DescribeTableCommand({
+          TableName: TABLES[table as keyof typeof TABLES],
+        }));
+        
+        if (response.Table?.TableStatus === 'ACTIVE') {
+          logInfo(`Connection to "${response.Table.TableName}" table is active.`);
+        } else {
+          throw new Error(`Table "${response.Table?.TableName}" is not active. Current status: ${response.Table?.TableStatus}`);
+        }
+      } catch (error) {
+        logError(`Error connecting to "${table}" table:`, error);
+        throw new Error(`Error connecting to "${table}" table`);
+      }
+    }
+  }
+
   static async clearAllData(): Promise<void> {
     try {
       // Get all items from each table and delete them
