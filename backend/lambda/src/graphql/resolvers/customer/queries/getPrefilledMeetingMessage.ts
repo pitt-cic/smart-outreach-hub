@@ -1,6 +1,7 @@
 import {QueryResolvers} from '../../../types/generated';
-import {CustomerModel} from '../../../../shared/database';
-import {logError, logInfo, normalizePhoneNumber, validatePhoneNumber} from '../../../../shared/utils';
+import {CustomerModel} from '../../../../shared/dynamodb';
+import {logError, logInfo} from '../../../../shared/log-utils';
+import {normalizePhoneNumber, validatePhoneNumber} from '../../../../shared/utils';
 import {ValidationError} from '../../../../shared/types';
 
 export const getPrefilledMeetingMessage: QueryResolvers['getPrefilledMeetingMessage'] = async (_parent, {phoneNumber}) => {

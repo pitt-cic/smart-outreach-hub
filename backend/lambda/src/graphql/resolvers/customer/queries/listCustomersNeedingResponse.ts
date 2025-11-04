@@ -1,6 +1,6 @@
 import {QueryResolvers} from '../../../types/generated';
-import {CustomerModel} from '../../../../shared/database';
-import {logError, logInfo} from '../../../../shared/utils';
+import {CustomerModel} from '../../../../shared/dynamodb';
+import {logError, logInfo} from '../../../../shared/log-utils';
 import {dbCustomerToGraphQL} from '../../shared/helpers';
 
 export const listCustomersNeedingResponse: QueryResolvers['listCustomersNeedingResponse'] = async () => {

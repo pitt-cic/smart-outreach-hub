@@ -1,7 +1,8 @@
-import {DbCampaign, ValidationError} from '../../../shared/types';
+import {ValidationError} from '../../../shared/types';
 import {Campaign, ChatMessage, Customer} from '../../types/generated';
+import {DbCampaign} from '../../../shared/dynamodb';
 import {InvokeCommand, LambdaClient} from '@aws-sdk/client-lambda';
-import {logError, logInfo} from '../../../shared/utils';
+import {logError, logInfo} from '../../../shared/log-utils';
 
 export const lambdaClient = new LambdaClient({region: process.env.AWS_REGION || 'us-east-1'});
 

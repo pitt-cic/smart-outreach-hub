@@ -1,11 +1,11 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
 import {createYoga} from 'graphql-yoga';
 import {makeExecutableSchema} from '@graphql-tools/schema';
-import * as utils from '../../shared/utils';
+import {logError, logInfo} from '../../shared/log-utils';
+import {createErrorResponse, createSuccessResponse} from '../../shared/utils';
+import {DatabaseUtils} from '../../shared/dynamodb'
 import {typeDefsString} from '../../graphql/schema';
 import {resolvers} from '../../graphql/resolvers';
-
-const {logInfo, logError, createSuccessResponse, createErrorResponse, initializeDatabase} = utils;
 
 // Create executable schema using the new modular .graphql files
 const schema = makeExecutableSchema({
@@ -31,7 +31,7 @@ const yoga = createYoga({
 
 export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
     try {
-        initializeDatabase();
+        DatabaseUtils.checkConnectionToDynamoDB();
         logInfo('Database initialized successfully');
     } catch (error) {
         logError('Failed to initialize database', error);
@@ -124,7 +124,7 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
 export const healthCheck = async (): Promise<APIGatewayProxyResult> => {
     try {
         // Test database connection
-        initializeDatabase();
+        DatabaseUtils.checkConnectionToDynamoDB();
 
         return createSuccessResponse({
             status: 'healthy',

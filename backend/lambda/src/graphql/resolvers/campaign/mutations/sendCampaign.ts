@@ -1,6 +1,6 @@
 import {MutationResolvers} from '../../../types/generated';
-import {CampaignModel} from '../../../../shared/database';
-import {logError, logInfo} from '../../../../shared/utils';
+import {CampaignModel} from '../../../../shared/dynamodb';
+import {logError, logInfo} from '../../../../shared/log-utils';
 import {ValidationError} from '../../../../shared/types';
 import {sendCampaignViaSQS} from '../../../../shared/sqs-service';
 import {dbCampaignToGraphQL} from '../../shared/helpers';

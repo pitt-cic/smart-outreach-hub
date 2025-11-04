@@ -1,6 +1,7 @@
 import {QueryResolvers} from '../../../types/generated';
-import {ChatMessageModel} from '../../../../shared/database';
-import {logError, logInfo, normalizePhoneNumber, validatePhoneNumber} from '../../../../shared/utils';
+import {ChatMessageModel} from '../../../../shared/dynamodb';
+import {logError, logInfo} from '../../../../shared/log-utils';
+import {normalizePhoneNumber, validatePhoneNumber} from '../../../../shared/utils';
 import {ValidationError} from '../../../../shared/types';
 import {dbMessageToGraphQL} from '../../shared/helpers';
 

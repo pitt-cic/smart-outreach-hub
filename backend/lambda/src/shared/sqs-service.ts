@@ -1,6 +1,7 @@
 import {SendMessageBatchCommand, SQSClient} from '@aws-sdk/client-sqs';
-import {CampaignModel, CustomerModel, CampaignCustomerModel} from './database';
-import {hasPersonalizationPlaceholders, logInfo, personalizeMessage} from './utils';
+import {CampaignModel, CustomerModel, CampaignCustomerModel} from './dynamodb';
+import {logInfo} from './log-utils';
+import {hasPersonalizationPlaceholders, personalizeMessage} from './utils';
 
 const sqsClient = new SQSClient({region: process.env.AWS_REGION});
 
