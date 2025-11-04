@@ -759,6 +759,7 @@ export type Query = {
    * **Use case:** Campaign overview dashboards, campaign selection dropdowns
    */
   listCampaigns: Array<Campaign>;
+  listCustomersByStatus: Array<Customer>;
   /**
    * Retrieves all customers with status 'needs_response'.
    *
@@ -854,6 +855,23 @@ export type QueryGetCustomerArgs = {
  */
 export type QueryGetPrefilledMeetingMessageArgs = {
   phoneNumber: Scalars['String']['input'];
+};
+
+
+/**
+ * Root query type for the Smart Outreach Hub GraphQL API.
+ *
+ * All queries for retrieving data are defined as extensions to this type
+ * in domain-specific schema files. This modular approach keeps the schema
+ * organized and maintainable.
+ *
+ * **Available query domains:**
+ * - Customer queries: Get and list customer data
+ * - Campaign queries: Retrieve campaign information and metrics
+ * - Message queries: Access chat history and messages
+ */
+export type QueryListCustomersByStatusArgs = {
+  status: CustomerStatus;
 };
 
 /**
@@ -1082,6 +1100,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   getPrefilledMeetingMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryGetPrefilledMeetingMessageArgs, 'phoneNumber'>>;
   listAllCustomers?: Resolver<Array<ResolversTypes['Customer']>, ParentType, ContextType>;
   listCampaigns?: Resolver<Array<ResolversTypes['Campaign']>, ParentType, ContextType>;
+  listCustomersByStatus?: Resolver<Array<ResolversTypes['Customer']>, ParentType, ContextType, RequireFields<QueryListCustomersByStatusArgs, 'status'>>;
   listCustomersNeedingResponse?: Resolver<Array<ResolversTypes['Customer']>, ParentType, ContextType>;
 }>;
 
