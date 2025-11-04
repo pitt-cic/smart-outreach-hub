@@ -1,7 +1,6 @@
 import { SQSRecord } from 'aws-lambda';
-import { CampaignCustomerModel, CampaignModel, ChatMessageModel } from '../../shared/dynamodb';
+import { CampaignCustomerModel, CampaignMetrics, CampaignModel, ChatMessageModel, UserSentiment } from '../../shared/dynamodb';
 import { logError, logInfo, logWarn } from '../../shared/log-utils';
-import { CampaignMetrics, UserSentiment } from '../../shared/types';
 import { normalizePhoneNumber, validatePhoneNumber } from '../../shared/utils';
 import { SMSService } from './services/sms-service';
 import { AgentResponse, CampaignMessage, ManualMessage, SQSMessageBody } from './types';
