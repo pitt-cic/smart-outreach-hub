@@ -1,0 +1,40 @@
+extend type Query {
+    """
+    Retrieves all messages across all customers and campaigns.
+
+    Returns messages in chronological order (most recent first). Use the
+    optional limit parameter to restrict the number of results for performance.
+
+    **Warning:** Without a limit, this query can return very large result sets.
+    Consider using pagination in production environments.
+
+    **Example:**
+    ```graphql
+    query {
+        getAllMessages(limit: 100) {
+            id
+            phoneNumber
+            message
+            direction
+            timestamp
+            responseType
+            campaignId
+        }
+    }
+    ```
+
+    **Use cases:**
+    - System-wide message monitoring
+    - Audit logs and compliance reporting
+    - Message volume analytics
+    - Debugging and troubleshooting
+    """
+    getAllMessages(
+        """
+        Optional limit on the number of messages to return.
+        Defaults to returning all messages if not specified.
+        Recommended: Set a reasonable limit (e.g., 100-1000) for performance.
+        """
+        limit: Int
+    ): [ChatMessage!]!
+}

@@ -481,11 +481,11 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         // GraphQL Lambda function
         const graphqlFunction = new lambda.Function(this, 'SmartOutreachHubGraphQLFunction', {
             functionName: 'outreach-graphql-api',
-            runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
+            runtime: new lambda.Runtime('nodejs22.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
             handler: 'functions/graphql/index.handler',
             code: lambda.Code.fromAsset(path.join(__dirname, '../lambda'), {
                 bundling: {
-                    image: cdk.DockerImage.fromRegistry('node:20-alpine'),
+                    image: cdk.DockerImage.fromRegistry('node:22-alpine'),
                     user: 'root',
                     command: [
                         'sh', '-c',
@@ -493,7 +493,8 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
                         'npm install --cache /tmp/.npm --no-audit --no-fund && ' +
                         'npm run build && ' +
                         'cp -r dist/* /asset-output/ && ' +
-                        'npm install --production --cache /tmp/.npm --no-audit --no-fund && ' +
+                        'mkdir -p /asset-output/graphql && ' +
+                        'cp -r src/graphql/schema /asset-output/graphql/ && ' +
                         'cp -r node_modules /asset-output/ && ' +
                         'cp package.json /asset-output/'
                     ],
@@ -560,11 +561,11 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         // Campaigns Lambda function
         const campaignsFunction = new lambda.Function(this, 'SmartOutreachHubCampaignsFunction', {
             functionName: 'outreach-campaigns-api',
-            runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
+            runtime: new lambda.Runtime('nodejs22.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
             handler: 'functions/campaigns/index.handler',
             code: lambda.Code.fromAsset(path.join(__dirname, '../lambda'), {
                 bundling: {
-                    image: cdk.DockerImage.fromRegistry('node:20-alpine'),
+                    image: cdk.DockerImage.fromRegistry('node:22-alpine'),
                     user: 'root',
                     command: [
                         'sh', '-c',
@@ -572,7 +573,6 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
                         'npm install --cache /tmp/.npm --no-audit --no-fund && ' +
                         'npm run build && ' +
                         'cp -r dist/* /asset-output/ && ' +
-                        'npm install --production --cache /tmp/.npm --no-audit --no-fund && ' +
                         'cp -r node_modules /asset-output/ && ' +
                         'cp package.json /asset-output/'
                     ],
@@ -645,12 +645,12 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         // Lambda function for processing inbound SMS messages
         const inboundSmsProcessor = new lambda.Function(this, 'SmartOutreachHubInboundSmsProcessor', {
             functionName: 'outreach-inbound-sms-processor',
-            runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
+            runtime: new lambda.Runtime('nodejs22.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
             handler: 'functions/inbound-sms-processor/index.handler',
             architecture: lambda.Architecture.ARM_64,
             code: lambda.Code.fromAsset(path.join(__dirname, '../lambda'), {
                 bundling: {
-                    image: cdk.DockerImage.fromRegistry('node:20-alpine'),
+                    image: cdk.DockerImage.fromRegistry('node:22-alpine'),
                     user: 'root',
                     command: [
                         'sh', '-c',
@@ -658,7 +658,6 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
                         'npm install --cache /tmp/.npm --no-audit --no-fund && ' +
                         'npm run build && ' +
                         'cp -r dist/* /asset-output/ && ' +
-                        'npm install --production --cache /tmp/.npm --no-audit --no-fund && ' +
                         'cp -r node_modules /asset-output/ && ' +
                         'cp package.json /asset-output/'
                     ],
@@ -697,12 +696,12 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
         // Lambda function for direct SMS sending (manual messages)
         const directSmsFunction = new lambda.Function(this, 'SmartOutreachHubDirectSmsFunction', {
             functionName: 'outreach-direct-sms',
-            runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
+            runtime: new lambda.Runtime('nodejs22.x', lambda.RuntimeFamily.NODEJS, {supportsInlineCode: true}),
             handler: 'functions/direct-sms/index.handler',
             architecture: lambda.Architecture.ARM_64,
             code: lambda.Code.fromAsset(path.join(__dirname, '../lambda'), {
                 bundling: {
-                    image: cdk.DockerImage.fromRegistry('node:20-alpine'),
+                    image: cdk.DockerImage.fromRegistry('node:22-alpine'),
                     user: 'root',
                     command: [
                         'sh', '-c',
@@ -710,7 +709,6 @@ export class SmartOutreachHubBackendStack extends cdk.Stack {
                         'npm install --cache /tmp/.npm --no-audit --no-fund && ' +
                         'npm run build && ' +
                         'cp -r dist/* /asset-output/ && ' +
-                        'npm install --production --cache /tmp/.npm --no-audit --no-fund && ' +
                         'cp -r node_modules /asset-output/ && ' +
                         'cp package.json /asset-output/'
                     ],

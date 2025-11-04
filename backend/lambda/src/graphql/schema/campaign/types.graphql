@@ -1,0 +1,127 @@
+"""
+Represents an outreach campaign with comprehensive tracking metrics.
+
+A campaign is a coordinated effort to send personalized messages to a list
+of contacts. It tracks delivery, responses, sentiment analysis, and handoff
+events throughout the customer journey.
+"""
+type Campaign {
+    """
+    Unique identifier for this campaign.
+    Auto-generated upon campaign creation.
+    """
+    campaignId: ID!
+
+    """
+    Human-readable name for this campaign.
+    Used for identification in dashboards and reports.
+    """
+    name: String!
+
+    """
+    The message template used for initial outreach.
+    May contain placeholders like {firstName} that are personalized per contact.
+    """
+    messageTemplate: String!
+
+    """
+    Optional additional context or notes about this campaign.
+    Can include campaign goals, target audience details, or special instructions.
+    """
+    campaignDetails: String
+
+    """
+    Total number of contacts included in this campaign.
+    Set during campaign creation and remains constant.
+    """
+    totalContacts: Int!
+
+    """
+    Number of messages successfully sent from this campaign.
+    Increments as messages are delivered to contacts.
+    """
+    sentCount: Int!
+
+    """
+    Total number of contacts who have replied to campaign messages.
+    A contact is counted once regardless of how many messages they send.
+    """
+    responseCount: Int!
+
+    """
+    Number of contacts whose overall sentiment is classified as positive.
+    Indicates interest, enthusiasm, or agreement with the outreach.
+    """
+    positiveResponseCount: Int!
+
+    """
+    Number of contacts whose overall sentiment is classified as neutral.
+    Indicates acknowledgment without strong positive or negative emotion.
+    """
+    neutralResponseCount: Int!
+
+    """
+    Number of contacts whose overall sentiment is classified as negative.
+    Indicates disinterest, rejection, or negative emotion.
+    """
+    negativeResponseCount: Int!
+
+    """
+    Percentage of responding contacts with positive sentiment.
+    Calculated as: (positiveResponseCount / responseCount) * 100
+    """
+    positiveResponseRate: Float!
+
+    """
+    Percentage of responding contacts with neutral sentiment.
+    Calculated as: (neutralResponseCount / responseCount) * 100
+    """
+    neutralResponseRate: Float!
+
+    """
+    Percentage of responding contacts with negative sentiment.
+    Calculated as: (negativeResponseCount / responseCount) * 100
+    """
+    negativeResponseRate: Float!
+
+    """
+    Number of positive sentiment contacts handed off to human agents.
+    Tracks successful escalations for high-intent customers.
+    """
+    positiveHandoffCount: Int!
+
+    """
+    Number of neutral sentiment contacts handed off to human agents.
+    May indicate edge cases requiring human judgment.
+    """
+    neutralHandoffCount: Int!
+
+    """
+    Number of negative sentiment contacts handed off to human agents.
+    Often for customer service recovery or dispute resolution.
+    """
+    negativeHandoffCount: Int!
+
+    """
+    Number of contacts whose first response was classified as positive.
+    Key metric for initial message effectiveness.
+    """
+    firstResponsePositiveCount: Int!
+
+    """
+    Number of contacts whose first response was classified as neutral.
+    Indicates lukewarm initial reception.
+    """
+    firstResponseNeutralCount: Int!
+
+    """
+    Number of contacts whose first response was classified as negative.
+    Important signal for message optimization.
+    """
+    firstResponseNegativeCount: Int!
+
+    """
+    ISO 8601 timestamp of when this campaign was created.
+    """
+    createdAt: String!
+}

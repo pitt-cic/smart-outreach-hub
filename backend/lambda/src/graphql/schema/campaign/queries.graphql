@@ -1,0 +1,62 @@
+extend type Query {
+    """
+    Retrieves a single campaign by its unique identifier.
+
+    Returns detailed campaign information including all performance metrics,
+    response counts, and sentiment analysis data. Returns null if no campaign
+    exists with the given ID.
+
+    **Example:**
+    ```graphql
+    query {
+        getCampaign(campaignId: "camp_123456") {
+            campaignId
+            name
+            messageTemplate
+            totalContacts
+            sentCount
+            responseCount
+            positiveResponseRate
+            neutralResponseRate
+            negativeResponseRate
+        }
+    }
+    ```
+
+    **Use case:** Campaign detail pages, performance dashboards, reporting
+    """
+    getCampaign(
+        """
+        The unique identifier of the campaign to retrieve.
+        """
+        campaignId: ID!
+    ): Campaign
+
+    """
+    Retrieves all campaigns in the system.
+
+    Returns campaigns with complete performance metrics. Results are
+    typically sorted by creation date (most recent first).
+
+    **Warning:** This query can return large result sets. Consider adding
+    pagination and filtering in future iterations for production use at scale.
+
+    **Example:**
+    ```graphql
+    query {
+        listCampaigns {
+            campaignId
+            name
+            createdAt
+            totalContacts
+            sentCount
+            responseCount
+            positiveResponseRate
+        }
+    }
+    ```
+
+    **Use case:** Campaign overview dashboards, campaign selection dropdowns
+    """
+    listCampaigns: [Campaign!]!
+}

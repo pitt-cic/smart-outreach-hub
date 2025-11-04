@@ -10,96 +10,11 @@ export interface HandleSQSEventResult {
   error?: string;
 }
 
-export type CustomerStatus = 'automated' | 'needs_response' | 'agent_responding';
-export type MessageDirection = 'outbound' | 'inbound';
-export type ResponseType = 'automated' | 'manual' | "ai_agent";
+// Database-specific enums (not in GraphQL schema)
 export type CampaignCustomerStatus = 'pending' | 'processing' | 'sent' | 'failed' | 'processed';
 export type UserSentiment = 'positive' | 'neutral' | 'negative';
 
-export interface Customer {
-    phoneNumber: string;
-    firstName: string;
-    lastName: string;
-    mostRecentCampaignId?: string;
-    status: CustomerStatus;
-    createdAt: string;
-    updatedAt: string;
-    chatHistory?: ChatMessage[];
-}
-
-export interface ChatMessage {
-    id: string;
-    phoneNumber: string;
-    campaignId?: string;
-    message: string;
-    direction: MessageDirection;
-    timestamp: string;
-    responseType?: ResponseType;
-}
-
-export interface Campaign {
-    campaignId: string;
-    name: string;
-    messageTemplate: string;
-    campaignDetails?: string;
-    totalContacts: number;
-    sentCount: number;
-    responseCount: number;
-    positiveHandoffCount: number;
-    neutralHandoffCount: number;
-    negativeHandoffCount: number;
-    positiveResponseCount: number;
-    neutralResponseCount: number;
-    negativeResponseCount: number;
-    positiveResponseRate: number;
-    neutralResponseRate: number;
-    negativeResponseRate: number;
-    firstResponsePositiveCount: number;
-    firstResponseNeutralCount: number;
-    firstResponseNegativeCount: number;
-    createdAt: string;
-}
-
-export interface ContactInput {
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-}
-
-export interface CreateCampaignInput {
-    name: string;
-    messageTemplate: string;
-    campaignDetails?: string;
-}
-
-export interface SendCampaignInput {
-    campaignId: string;
-}
-
-export interface SendManualMessageInput {
-    phoneNumber: string;
-    message: string;
-}
-
-export interface UpdateCustomerStatusInput {
-    phoneNumber: string;
-    status: CustomerStatus;
-}
-
-// GraphQL Response Types
-export interface GraphQLResponse<T> {
-    data?: T;
-    errors?: Array<{
-        message: string;
-        locations?: Array<{
-            line: number;
-            column: number;
-        }>;
-        path?: string[];
-    }>;
-}
-
-// Database model types (matching SQLite structure)
+// Database model types (matching DynamoDB structure)
 export interface DbCustomer {
     phone_number: string;
     first_name: string;

@@ -1,0 +1,75 @@
+"""
+Represents the current state of a customer in the outreach workflow.
+Determines how messages from this customer are handled.
+"""
+enum CustomerStatus {
+    """
+    Customer is receiving automated responses from the AI agent.
+    No human intervention required at this stage.
+    """
+    automated
+
+    """
+    Customer has sent a message that requires human review or response.
+    This status triggers alerts for agents to take action.
+    """
+    needs_response
+
+    """
+    A human agent is actively engaged in conversation with this customer.
+    Automated responses are disabled to prevent conflicts.
+    """
+    agent_responding
+}
+
+"""
+Represents a contact in the outreach system.
+Each customer is uniquely identified by their phone number and tracks
+their interaction history across all campaigns.
+"""
+type Customer {
+    """
+    The customer's phone number in E.164 format (e.g., +12345678900).
+    This serves as the unique identifier for the customer.
+    """
+    phoneNumber: String!
+
+    """
+    The customer's first name as provided during initial contact or campaign upload.
+    """
+    firstName: String!
+
+    """
+    The customer's last name as provided during initial contact or campaign upload.
+    """
+    lastName: String!
+
+    """
+    The ID of the most recent campaign this customer was part of.
+    Null if the customer hasn't been included in any campaigns yet.
+    """
+    mostRecentCampaignId: String
+
+    """
+    Current status of the customer in the outreach workflow.
+    Determines whether messages are automated, need review, or are handled by an agent.
+    """
+    status: CustomerStatus!
+
+    """
+    ISO 8601 timestamp of when this customer record was first created in the system.
+    """
+    createdAt: String!
+
+    """
+    ISO 8601 timestamp of when this customer record was last updated.
+    Updates occur when status changes or new messages are exchanged.
+    """
+    updatedAt: String!
+
+    """
+    Complete message history for this customer across all campaigns.
+    Includes both inbound and outbound messages in chronological order.
+    """
+    chatHistory: [ChatMessage!]!
+}

@@ -1,0 +1,28 @@
+"""
+Root query type for the Smart Outreach Hub GraphQL API.
+
+All queries for retrieving data are defined as extensions to this type
+in domain-specific schema files. This modular approach keeps the schema
+organized and maintainable.
+
+**Available query domains:**
+- Customer queries: Get and list customer data
+- Campaign queries: Retrieve campaign information and metrics
+- Message queries: Access chat history and messages
+"""
+type Query
+
+"""
+Root mutation type for the Smart Outreach Hub GraphQL API.
+
+All mutations for modifying data are defined as extensions to this type
+in domain-specific schema files. Mutations may trigger side effects such
+as sending messages, updating customer status, or initializing campaigns.
+
+**Available mutation domains:**
+- Customer mutations: Update customer status and data
+- Campaign mutations: Create, update, and send campaigns
+- Message mutations: Send manual messages
+- Shared mutations: System-wide operations
+"""
+type Mutation

@@ -1,117 +1,15 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
 import {createYoga} from 'graphql-yoga';
 import {makeExecutableSchema} from '@graphql-tools/schema';
-// Import shared modules using relative paths
-import {resolvers} from '../../shared/resolvers';
 import * as utils from '../../shared/utils';
+import {typeDefsString} from '../../graphql/schema';
+import {resolvers} from '../../graphql/resolvers';
 
 const {logInfo, logError, createSuccessResponse, createErrorResponse, initializeDatabase} = utils;
 
-// GraphQL Schema Definition
-const typeDefs = `
-  enum CustomerStatus {
-    automated
-    needs_response
-    agent_responding
-  }
-
-  enum MessageDirection {
-    outbound
-    inbound
-  }
-
-  enum ResponseType {
-    automated
-    manual
-    ai_agent
-  }
-
-  type Customer {
-    phoneNumber: String!
-    firstName: String!
-    lastName: String!
-    mostRecentCampaignId: String
-    status: CustomerStatus!
-    createdAt: String!
-    updatedAt: String!
-    chatHistory: [ChatMessage!]!
-  }
-
-  type ChatMessage {
-    id: ID!
-    phoneNumber: String!
-    campaignId: String
-    message: String!
-    direction: MessageDirection!
-    timestamp: String!
-    responseType: ResponseType
-  }
-
-  type Campaign {
-    campaignId: ID!
-    name: String!
-    messageTemplate: String!
-    campaignDetails: String
-    totalContacts: Int!
-    sentCount: Int!
-    responseCount: Int!
-    positiveResponseCount: Int!
-    neutralResponseCount: Int!
-    negativeResponseCount: Int!
-    positiveResponseRate: Float!
-    neutralResponseRate: Float!
-    negativeResponseRate: Float!
-    positiveHandoffCount: Int!
-    neutralHandoffCount: Int!
-    negativeHandoffCount: Int!
-    firstResponsePositiveCount: Int!
-    firstResponseNeutralCount: Int!
-    firstResponseNegativeCount: Int!
-    createdAt: String!
-  }
-
-  input ContactInput {
-    firstName: String!
-    lastName: String!
-    phoneNumber: String!
-  }
-
-  input CreateCampaignInput {
-    name: String!
-    messageTemplate: String!
-    campaignDetails: String
-  }
-
-  input UpdateCampaignInput {
-    campaignId: ID!
-    campaignDetails: String
-  }
-
-  type Query {
-    getCustomer(phoneNumber: String!): Customer
-    listCustomersNeedingResponse: [Customer!]!
-    listAllCustomers: [Customer!]!
-    getCampaign(campaignId: ID!): Campaign
-    listCampaigns: [Campaign!]!
-    getChatHistory(phoneNumber: String!): [ChatMessage!]!
-    getAllMessages(limit: Int): [ChatMessage!]!
-    getPrefilledMeetingMessage(phoneNumber: String!): String
-  }
-
-  type Mutation {
-    createCampaign(input: CreateCampaignInput!): Campaign!
-    updateCampaign(input: UpdateCampaignInput!): Campaign!
-    sendCampaign(campaignId: ID!): Campaign!
-    sendManualMessage(phoneNumber: String!, message: String!): ChatMessage!
-    updateCustomerStatus(phoneNumber: String!, status: CustomerStatus!): Customer!
-    simulateInboundMessage(phoneNumber: String!, message: String!): ChatMessage!
-    clearAllData: Boolean!
-  }
-`;
-
-// Create executable schema
+// Create executable schema using the new modular .graphql files
 const schema = makeExecutableSchema({
-    typeDefs,
+    typeDefs: typeDefsString,
     resolvers,
 });
 
@@ -120,7 +18,6 @@ const yoga = createYoga({
     schema,
     context: ({request}) => ({
         request,
-        // Add any additional context here
     }),
     cors: {
         origin: process.env.CORS_ORIGIN || '*',
@@ -129,14 +26,10 @@ const yoga = createYoga({
         credentials: true,
     },
     graphqlEndpoint: '/graphql',
-    landingPage: process.env.NODE_ENV !== 'production', // Enable GraphQL playground in development
+    landingPage: process.env.NODE_ENV !== 'production',
 });
 
-export const handler = async (
-    event: APIGatewayProxyEvent,
-    context: Context
-): Promise<APIGatewayProxyResult> => {
-    // Initialize database connection
+export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
     try {
         initializeDatabase();
         logInfo('Database initialized successfully');
@@ -217,7 +110,6 @@ export const handler = async (
 
     } catch (error) {
         logError('GraphQL Lambda error', error);
-
         return createErrorResponse(
             'Internal server error',
             500,
@@ -229,7 +121,6 @@ export const handler = async (
     }
 };
 
-// Health check handler for API Gateway health checks
 export const healthCheck = async (): Promise<APIGatewayProxyResult> => {
     try {
         // Test database connection
