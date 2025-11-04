@@ -483,16 +483,16 @@ export type Mutation = {
    * **Example:**
    * ```graphql
    * mutation {
-   *     updateCustomerStatus(
-   *         phoneNumber: "+12345678900"
-   *         status: agent_responding
-   *     ) {
-   *         phoneNumber
-   *         firstName
-   *         lastName
-   *         status
-   *         updatedAt
-   *     }
+   * updateCustomerStatus(
+   * phoneNumber: "+12345678900"
+   * status: agent_responding
+   * ) {
+   * phoneNumber
+   * firstName
+   * lastName
+   * status
+   * updatedAt
+   * }
    * }
    * ```
    *
@@ -882,9 +882,7 @@ export type ResponseType =
    * or system events. No AI or human involvement in generation.
    *
    * **Examples:**
-   * - Welcome messages after opt-in
-   * - Auto-replies to common keywords
-   * - Scheduled follow-up messages
+   * - Campaign messages sent to customers
    */
   | 'automated'
   /**
