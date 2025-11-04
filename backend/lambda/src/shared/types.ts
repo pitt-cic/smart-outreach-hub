@@ -1,3 +1,15 @@
+export interface LambdaHandlerResult {
+    statusCode: number;
+    body: string;
+    headers?: Record<string, string>;
+}
+
+export interface HandleSQSEventResult {
+  itemIdentifier: string;
+  success: boolean;
+  error?: string;
+}
+
 // Database-specific enums (not in GraphQL schema)
 export type CampaignCustomerStatus = 'pending' | 'processing' | 'sent' | 'failed' | 'processed';
 export type UserSentiment = 'positive' | 'neutral' | 'negative';

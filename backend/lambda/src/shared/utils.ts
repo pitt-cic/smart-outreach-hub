@@ -1,4 +1,6 @@
 import {isValidPhoneNumber, parsePhoneNumberFromString} from 'libphonenumber-js';
+import {RESPONSE_HEADERS} from './constants';
+import {LambdaHandlerResult} from './types';
 
 // Re-export initializeDatabase from database module
 export {initializeDatabase} from './database';
@@ -29,6 +31,18 @@ export function normalizePhoneNumber(phoneNumber: string): string {
     } catch (error) {
         return phoneNumber;
     }
+}
+
+/**
+ * Mask a phone number for privacy, showing only the last 4 digits.
+ * @param phoneNumber The phone number
+ * @returns Masked phone number; if less than 4 digits, returns original number
+ */
+export function maskPhoneNumber(phoneNumber: string): string {
+    if (phoneNumber.length >= 4) {
+        return `***-***-${phoneNumber.slice(-4)}`;
+    }
+    return phoneNumber;
 }
 
 export function truncateText(text: string, maxLength: number): string {
@@ -64,34 +78,38 @@ export function logDebug(message: string, data?: any): void {
 }
 
 // Lambda response helpers
-export function createSuccessResponse(data: any, statusCode: number = 200) {
-    return {
+export function createSuccessResponse(data: any, statusCode: number = 200, excludeHeaders?: boolean): LambdaHandlerResult {
+    const response: LambdaHandlerResult = {
         statusCode,
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT,DELETE'
-        },
         body: JSON.stringify({success: true, data})
     };
+
+    if (excludeHeaders) {
+        return response;
+    }
+
+    response.headers = RESPONSE_HEADERS;
+    
+    return response;
 }
 
-export function createErrorResponse(message: string, statusCode: number = 500, details?: any) {
-    return {
+export function createErrorResponse(message: string, statusCode: number = 500, details?: any, excludeHeaders?: boolean): LambdaHandlerResult {
+    const response: LambdaHandlerResult = {
         statusCode,
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key',
-            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT,DELETE'
-        },
         body: JSON.stringify({
             success: false,
             error: message,
             details: details || undefined
         })
     };
+
+    if (excludeHeaders) {
+        return response;
+    }
+
+    response.headers = RESPONSE_HEADERS;
+
+    return response;
 }
 
 // Template processing utilities

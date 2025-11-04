@@ -1,6 +1,6 @@
 """Data models for agent responses and context."""
 
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel
 from pydantic.dataclasses import dataclass
@@ -19,8 +19,8 @@ class AgentResponse(BaseModel):
 
     response_text: str
     should_handoff: bool
-    handoff_reason: Optional[str] = None
-    user_sentiment: Optional[Literal["positive", "neutral", "negative"]] = None
+    handoff_reason: str | None = None
+    user_sentiment: Literal["positive", "neutral", "negative"] | None = None
 
     def as_dict(self) -> dict:
         """Return a dictionary of all fields and their values"""
@@ -36,7 +36,7 @@ class AgentResponseWrapper(AgentResponse):
     guardrails_intervened: bool = False
     request_tokens: int = 0
     response_tokens: int = 0
-    campaign_id: str
+    campaign_id: str | None = None
 
     def as_dict(self) -> dict:
         """Return a dictionary of all fields and their values"""
@@ -52,5 +52,5 @@ class AgentContext:
 
     customer_phone_number: str
     customer_name: str
-    customer_email: Optional[str] = None
-    most_recent_campaign_id: Optional[str] = None
+    customer_email: str | None = None
+    most_recent_campaign_id: str | None = None
