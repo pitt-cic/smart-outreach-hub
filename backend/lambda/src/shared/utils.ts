@@ -2,9 +2,6 @@ import {isValidPhoneNumber, parsePhoneNumberFromString} from 'libphonenumber-js'
 import {RESPONSE_HEADERS} from './constants';
 import {LambdaHandlerResult} from './types';
 
-// Re-export initializeDatabase from database module
-export {initializeDatabase} from './database';
-
 export function formatPhoneNumber(phoneNumber: string): string {
     try {
         const parsed = parsePhoneNumberFromString(phoneNumber, 'US');
@@ -56,25 +53,6 @@ export function generateId(prefix: string = ''): string {
     const timestamp = Date.now().toString(36);
     const randomStr = Math.random().toString(36).substr(2, 9);
     return prefix ? `${prefix}_${timestamp}_${randomStr}` : `${timestamp}_${randomStr}`;
-}
-
-// Logging utilities for Lambda
-export function logInfo(message: string, data?: any): void {
-    console.log(`[INFO] ${message}`, data ? JSON.stringify(data, null, 2) : '');
-}
-
-export function logWarn(message: string, data?: any): void {
-    console.warn(`[WARN] ${message}`, data ? JSON.stringify(data, null, 2) : '');
-}
-
-export function logError(message: string, error?: any): void {
-    console.error(`[ERROR] ${message}`, error);
-}
-
-export function logDebug(message: string, data?: any): void {
-    if (process.env.LOG_LEVEL === 'DEBUG') {
-        console.log(`[DEBUG] ${message}`, data ? JSON.stringify(data, null, 2) : '');
-    }
 }
 
 // Lambda response helpers

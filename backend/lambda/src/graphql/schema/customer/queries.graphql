@@ -49,6 +49,8 @@ extend type Query {
     """
     listAllCustomers: [Customer!]!
 
+    listCustomersByStatus(status: CustomerStatus!): [Customer!]!
+
     """
     Retrieves the complete message history for a specific customer.
 

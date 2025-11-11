@@ -1,4 +1,4 @@
-import { UserSentiment } from '../../shared/types';
+import { UserSentiment } from '../../shared/dynamodb';
 
 export interface AgentResponse {
   response_text: string;

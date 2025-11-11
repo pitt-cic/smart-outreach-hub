@@ -1,6 +1,6 @@
 import {QueryResolvers} from '../../../types/generated';
-import {ChatMessageModel} from '../../../../shared/database';
-import {logError, logInfo} from '../../../../shared/utils';
+import {ChatMessageModel} from '../../../../shared/dynamodb';
+import {logError, logInfo} from '../../../../shared/log-utils';
 import {dbMessageToGraphQL} from '../../shared/helpers';
 
 export const getAllMessages: QueryResolvers['getAllMessages'] = async (_parent, {limit}) => {

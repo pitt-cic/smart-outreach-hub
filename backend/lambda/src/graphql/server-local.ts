@@ -3,11 +3,12 @@ import {makeExecutableSchema} from '@graphql-tools/schema';
 import {createServer} from 'http';
 import {typeDefsString} from './schema';
 import {resolvers} from './resolvers';
-import {initializeDatabase, logInfo, logError} from '../shared/utils';
+import {logInfo, logError} from '../shared/log-utils';
+import {DatabaseUtils} from '../shared/dynamodb';
 
 // Initialize database connection
 try {
-    initializeDatabase();
+    DatabaseUtils.checkConnectionToDynamoDB();
     logInfo('Database initialized successfully');
 } catch (error) {
     logError('Failed to initialize database', error);

@@ -1,6 +1,6 @@
 import {CustomerResolvers} from '../../types/generated';
-import {ChatMessageModel} from '../../../shared/database';
-import {logError} from '../../../shared/utils';
+import {ChatMessageModel} from '../../../shared/dynamodb';
+import {logError} from '../../../shared/log-utils';
 import {dbMessageToGraphQL} from '../shared/helpers';
 
 export const customerFields: CustomerResolvers = {

@@ -102,7 +102,7 @@ export const GET_CUSTOMERS_NEEDING_RESPONSE = `
 `;
 
 export const GET_CUSTOMERS_BY_STATUS = `
-  query GetCustomersByStatus($status: CustomerStatus) {
+  query GetCustomersByStatus($status: CustomerStatus!) {
     listCustomersByStatus(status: $status) {
       phoneNumber
       firstName

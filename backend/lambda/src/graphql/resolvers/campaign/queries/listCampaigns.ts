@@ -1,6 +1,6 @@
 import {QueryResolvers} from '../../../types/generated';
-import {CampaignModel} from '../../../../shared/database';
-import {logError, logInfo} from '../../../../shared/utils';
+import {CampaignModel} from '../../../../shared/dynamodb';
+import {logError, logInfo} from '../../../../shared/log-utils';
 import {dbCampaignToGraphQL} from '../../shared/helpers';
 
 export const listCampaigns: QueryResolvers['listCampaigns'] = async () => {

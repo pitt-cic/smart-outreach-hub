@@ -1,6 +1,6 @@
 import {MutationResolvers} from '../../../types/generated';
-import {DatabaseUtils} from '../../../../shared/database';
-import {logError, logInfo} from '../../../../shared/utils';
+import {DatabaseUtils} from '../../../../shared/dynamodb';
+import {logError, logInfo} from '../../../../shared/log-utils';
 import {ValidationError} from '../../../../shared/types';
 
 export const clearAllData: MutationResolvers['clearAllData'] = async () => {
