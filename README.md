@@ -1,16 +1,17 @@
 # Smart Outreach Hub
 
-| Index                                             | Description                                                             |
-|:--------------------------------------------------|:------------------------------------------------------------------------|
-| [Overview](#overview)                             | See the motivation behind this project                                  |
-| [Description](#description)                       | Learn more about the problem, and how we approached the solution        |
-| [Deployment](#deployment)                         | How to install and deploy the solution                                  |
-| [Usage](#usage)                                   | How to use Smart Outreach Hub                                           |
-| [Troubleshooting](#troubleshooting)               | Common issues and solutions                                             |
-| [Lessons Learned](#lessons-learned)               | Key takeaways and insights from the project, and next steps             |
-| [Bill of Materials](#bill-of-materials)           | Cost of deployment and resources used                                   |
-| [Credits](#credits)                               | Meet the team behind this project                                       |
-| [License](#license)                               | See the project's license information                                   |
+| Index                                   | Description                                                      |
+|:----------------------------------------|:-----------------------------------------------------------------|
+| [Overview](#overview)                   | See the motivation behind this project                           |
+| [Description](#description)             | Learn more about the problem, and how we approached the solution |
+| [Deployment](#deployment)               | How to install and deploy the solution                           |
+| [Usage](#usage)                         | How to use Smart Outreach Hub                                    |
+| [Troubleshooting](#troubleshooting)     | Common issues and solutions                                      |
+| [Lessons Learned](#lessons-learned)     | Key takeaways and insights from the project, and next steps      |
+| [Bill of Materials](#bill-of-materials) | Cost of deployment and resources used                            |
+| [Credits](#credits)                     | Meet the team behind this project                                |
+| [License](#license)                     | See the project's license information                            |
+| [Disclaimers](#Disclaimers)             | Disclaimers information.                                         
 
 # Overview
 
@@ -422,6 +423,10 @@ For current AWS pricing information, visit the [AWS Pricing Calculator](https://
 This project is designed and developed with guidance and support from
 the [Health Sciences and Sports Analytics Cloud Innovation Center, powered by AWS](https://digital.pitt.edu/cic).
 
+For questions, issues, or contributions, please visit
+our [GitHub repository](https://github.com/pitt-cic/smart-outreach-hub/) or contact the development team.
+
+
 # License
 
 This project is licensed under the [MIT License](./LICENSE).
@@ -452,5 +457,19 @@ SOFTWARE.
 
 ---
 
-For questions, issues, or contributions, please visit
-our [GitHub repository](https://github.com/pitt-cic/smart-outreach-hub/) or contact the development team.
+## Disclaimers
+
+**Customers are responsible for making their own independent assessment of the information in this document.** 
+
+**This document:**  
+(a) is for informational purposes only,  
+(b) references AWS product offerings and practices, which are subject to change without notice,  
+(c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided "as is" without warranties, representations, or conditions of any kind, whether express or implied. The responsibilities and liabilities of AWS to its customers are controlled by AWS agreements, and this document is not part of, nor does it modify, any agreement between AWS and its customers, and  
+(d) is not to be considered a recommendation or viewpoint of AWS.   
+
+**Additionally, you are solely responsible for testing, security and optimizing all code and assets on GitHub repo, and all such code and assets should be considered:**  
+(a) as-is and without warranties or representations of any kind,  
+(b) not suitable for production environments, or on production or other critical data, and  
+(c) to include shortcuts in order to support rapid prototyping such as, but not limited to, relaxed authentication and authorization and a lack of strict adherence to security best practices.     
+
+**All work produced is open source. More information can be found in the GitHub repo.**
